@@ -42,7 +42,7 @@ Todos los usuarios utilizan la siguiente contraseña: `97v6M2!pe<`
 
 1. **Clonar el repositorio**
 ```bash
-git clone 
+git clone https://github.com/jepmasanas/borsaInsPla.git
 cd borsaInsPla
 ```
 
@@ -78,12 +78,12 @@ Edita el archivo `.env` y rellena los valores necesarios, especialmente `EMAIL_H
 python manage.py migrate
 ```
 
-6. **Crear superusuario**
+6. **Crear superusuari**
 ```bash
 python manage.py createsuperuser
 ```
 
-7. **Ejecutar servidor**
+7. **Executar servidor**
 ```bash
 python manage.py runserver
 ```
@@ -91,14 +91,14 @@ Accede a `http://localhost:8000`
 
 ---
 
-## 🌍 Internacionalización (i18n)
+## 🌍 Internacionalització (i18n)
 
-EstanyJobs soporta tres idiomas:
+borsaInsPla soporta tres idiomas:
 - 🇪🇸 **Català** (idioma por defecto)
 - 🇪🇸 **Español**
 - 🇬🇧 **English**
 
-### Flujo de Trabajo para Traducciones
+### Fluxe de Trabajo para Traducciones
 
 #### 1. Marcar templates para traducción
 Este script modifica tus templates HTML para envolver textos con `{% trans %}`:
