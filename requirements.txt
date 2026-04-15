@@ -1,0 +1,7 @@
+Django==5.0.1
+pillow==10.2.0
+python-decouple==3.8
+psycopg2-binary==2.9.9
+django-otp==1.6.1
+django-chartjs==2.3.0
+dotenv

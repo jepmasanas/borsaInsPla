@@ -1,0 +1,139 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}Inscriure's a l'oferta{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 py-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <a href="{% url 'alumno_detalle_oferta' oferta.pk %}" class="text-blue-600 hover:text-blue-800 text-sm mb-3 inline-block">
+            ← Tornar a l'oferta
+        </a>
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">Inscriure't a l'oferta</h1>
+        <p class="text-gray-600 text-sm sm:text-base">{{ oferta.titulo }}</p>
+    </div>
+
+    <!-- Información de la oferta -->
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">📋 Detalls de l'oferta</h2>
+
+        <div class="space-y-3">
+            <div class="flex flex-wrap gap-2">
+                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                    {{ oferta.get_modalidad_display }}
+                </span>
+                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+                    {{ oferta.get_tipo_contrato_display }}
+                </span>
+                {% if oferta.ubicacion %}
+                <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
+                    📍 {{ oferta.ubicacion }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="border-t pt-3">
+                <p class="text-gray-700"><strong>Empresa:</strong> {{ oferta.empresa.nombre_empresa }}</p>
+                {% if oferta.salario %}
+                <p class="text-gray-700 mt-2"><strong>Salari:</strong> {{ oferta.salario }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de inscripción -->
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">✍️ Carta de presentació</h2>
+
+        <form method="POST" action="{% url 'alumno_inscribirse' oferta.pk %}">
+            {% csrf_token %}
+
+            <div class="mb-6">
+                <label for="carta_presentacion" class="block text-gray-700 font-medium mb-2">
+                    Carta de presentació (opcional)
+                </label>
+                <textarea
+                    id="carta_presentacion"
+                    name="carta_presentacion"
+                    rows="8"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    placeholder="Explica per què estàs interessat en aquesta oferta, què pots aportar a l'empresa, la teva experiència rellevant, etc."
+                ></textarea>
+                <p class="text-sm text-gray-500 mt-2">
+                    💡 Consell: Una bona carta de presentació pot marcar la diferència
+                </p>
+            </div>
+
+            <!-- Información importante -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <h3 class="font-semibold text-blue-900 mb-2">ℹ️ Informació important</h3>
+                <ul class="text-sm text-blue-800 space-y-1">
+                    <li>• El teu CV i perfil seran visibles per l'empresa</li>
+                    <li>• Rebràs notificacions sobre l'estat de la teva candidatura</li>
+                    <li>• Pots cancel·lar la inscripció en qualsevol moment</li>
+                </ul>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button
+                    type="submit"
+                    class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition text-sm font-semibold"
+                >
+                    ✅ Inscriure'm a l'oferta
+                </button>
+                <a
+                    href="{% url 'alumno_detalle_oferta' oferta.pk %}"
+                    class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 transition text-sm font-semibold text-center"
+                >
+                    ❌ Cancel·lar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Consejo adicional -->
+    <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <p class="text-sm text-yellow-800">
+            <strong>💼 Recorda:</strong> Assegura't que el teu perfil estigui complet abans d'inscriure't.
+            <a href="{% url 'alumno_perfil' %}" class="underline hover:text-yellow-900">Edita el teu perfil aquí</a>
+        </p>
+    </div>
+</div>
+
+<style>
+    h1 {
+        font-size: clamp(1.5rem, 5vw, 2.25rem);
+        line-height: 1.2;
+    }
+
+    h2 {
+        font-size: clamp(1.25rem, 4vw, 1.5rem);
+        line-height: 1.2;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    @media (max-width: 640px) {
+        button, a {
+            min-height: 44px;
+            font-size: 16px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+        }
+    }
+</style>
+{% endblock %}

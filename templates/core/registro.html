@@ -1,0 +1,518 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}Registrar-se{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-2xl px-4">
+    <div class="bg-white rounded-lg sm:rounded-xl shadow-lg sm:shadow-xl p-6 sm:p-8 lg:p-10">
+        <!-- Header -->
+        <div class="text-center mb-6 sm:mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-blue-100 rounded-full mb-4">
+                <span class="text-3xl sm:text-4xl">📝</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+                {% trans "Crear compte" %}
+            </h2>
+            <p class="text-sm sm:text-base text-gray-600 mt-2">
+                Uneix-te a EstanyJobs
+            </p>
+        </div>
+
+        <form method="post" id="registroForm" class="space-y-4 sm:space-y-5">
+            {% csrf_token %}
+
+            <!-- Datos básicos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div>
+                    <label for="username" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                        Nom d'usuari *
+                    </label>
+                    <input
+                            type="text"
+                            name="username"
+                            id="username"
+                            required
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                        Email *
+                    </label>
+                    <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            required
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                <div>
+                    <label for="password" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                        Contrasenya *
+                    </label>
+                    <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            required
+                            minlength="10"
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                    <div id="password-strength" class="mt-2 text-xs sm:text-sm"></div>
+                    <ul class="text-xs text-gray-600 mt-2 space-y-1">
+                        <li id="length-check">{% trans "• Mínim 10 caràcters" %}</li>
+                        <li id="uppercase-check">{% trans "• Almenys una majúscula" %}</li>
+                        <li id="lowercase-check">{% trans "• Almenys una minúscula" %}</li>
+                        <li id="number-check">{% trans "• Almenys un número" %}</li>
+                        <li id="special-check">{% trans "• Almenys un caràcter especial (!@#$...)" %}</li>
+                        <li id="sequence-check">{% trans "• Sense seqüències llargues (màxim 3 consecutius)" %}</li>
+                        <li id="repeated-check">{% trans "• Sense més de 3 caràcters repetits (aaaa, 1111...)" %}</li>
+                        <li id="pattern-check">{% trans "• Sense patrons comuns (password, admin...)" %}</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <label for="password2" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                        Repetir contrasenya *
+                    </label>
+                    <input
+                            type="password"
+                            name="password2"
+                            id="password2"
+                            required
+                            minlength="10"
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                    <div id="password-match" class="mt-2 text-xs sm:text-sm"></div>
+                </div>
+            </div>
+
+            <!-- Selección de rol -->
+            <div>
+                <label for="role" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                    Tipus d'usuari *
+                </label>
+                <select
+                        name="role"
+                        id="role"
+                        required
+                        class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        onchange="toggleRoleFields()"
+                >
+                    <option value="">{% trans "Selecciona..." %}</option>
+                    <option value="alumno">{% trans "Alumne / Exalumne" %}</option>
+                    <option value="empresa">{% trans "Empresa" %}</option>
+                </select>
+            </div>
+
+            <!-- Campos específicos para ALUMNO -->
+            <div id="camposAlumno" class="space-y-4 sm:space-y-5 hidden">
+                <div>
+                    <label for="nom_complet" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                        Nom complet *
+                    </label>
+                    <input
+                            type="text"
+                            name="nom_complet"
+                            id="nom_complet"
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                    <div>
+                        <label for="cicle" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                            Cicle formatiu *
+                        </label>
+                        <select
+                                name="cicle"
+                                id="cicle"
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        >
+                            <option value="">Selecciona...</option>
+                            <option value="DAM">CFGS DAM - Desenvolupament d'Aplicacions Multiplataforma</option>
+                            <option value="SMX">CFGM SMX - Sistemes microinformàtics i xarxes</option>
+                            <option value="APD">CFGM APD - Atenció a la dependència (Dual)</option>
+                            <option value="CAI">CFGM CAI - Cures Auxiliars d'Infermeria</option>
+                            <option value="ESO">ESO - Educació Secundària Obligatòria</option>
+                            <option value="BATX">Batxillerat</option>
+                            <option value="altres">Altres</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="any_graduacio" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                            Any de graduació *
+                        </label>
+                        <input
+                                type="number"
+                                name="any_graduacio"
+                                id="any_graduacio"
+                                min="2020"
+                                max="2030"
+                                value="2025"
+                                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campos específicos para EMPRESA -->
+            <div id="camposEmpresa" class="space-y-4 sm:space-y-5 hidden">
+                <div>
+                    <label for="nombre_empresa" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                        Nom de l'empresa *
+                    </label>
+                    <input
+                            type="text"
+                            name="nombre_empresa"
+                            id="nombre_empresa"
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+
+                <div>
+                    <label for="cif" class="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                        CIF/NIF *
+                    </label>
+                    <input
+                            type="text"
+                            name="cif"
+                            id="cif"
+                            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+            </div>
+
+            <button
+                    type="submit"
+                    id="submitBtn"
+                    class="w-full bg-blue-600 text-white py-2.5 sm:py-3 text-sm sm:text-base rounded-lg font-semibold hover:bg-blue-700 active:scale-[0.98] transition-all shadow-md hover:shadow-lg mt-6 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+                Registrar-se
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="relative my-6 sm:my-8">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-xs sm:text-sm">
+                <span class="px-3 sm:px-4 bg-white text-gray-500">O</span>
+            </div>
+        </div>
+
+        <!-- Login link -->
+        <div class="text-center">
+            <p class="text-sm sm:text-base text-gray-600">
+                Ja tens compte?
+                <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-700 font-semibold hover:underline transition">
+                    Inicia sessió aquí
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Extra info -->
+    <div class="mt-6 sm:mt-8 text-center">
+        <p class="text-xs sm:text-sm text-gray-500">
+            En registrar-te acceptes els nostres termes i condicions
+        </p>
+    </div>
+</div>
+
+<script>
+    function toggleRoleFields() {
+        const role = document.getElementById('role').value;
+        const camposAlumno = document.getElementById('camposAlumno');
+        const camposEmpresa = document.getElementById('camposEmpresa');
+
+        if (role === 'alumno') {
+            camposAlumno.classList.remove('hidden');
+            camposEmpresa.classList.add('hidden');
+            document.getElementById('nom_complet').required = true;
+            document.getElementById('cicle').required = true;
+            document.getElementById('any_graduacio').required = true;
+            document.getElementById('nombre_empresa').required = false;
+            document.getElementById('cif').required = false;
+        } else if (role === 'empresa') {
+            camposAlumno.classList.add('hidden');
+            camposEmpresa.classList.remove('hidden');
+            document.getElementById('nom_complet').required = false;
+            document.getElementById('cicle').required = false;
+            document.getElementById('any_graduacio').required = false;
+            document.getElementById('nombre_empresa').required = true;
+            document.getElementById('cif').required = true;
+        } else {
+            camposAlumno.classList.add('hidden');
+            camposEmpresa.classList.add('hidden');
+        }
+    }
+
+    // Validadores
+    class PasswordValidators {
+        static getMaxSequenceLength(password) {
+            const lower = password.toLowerCase();
+            let maxSequenceLength = 0;
+
+            // Secuencias numéricas ascendentes
+            for (let i = 0; i <= password.length - 2; i++) {
+                let seqLength = 1;
+                for (let j = i; j < password.length - 1; j++) {
+                    if (/^\d$/.test(password[j]) && /^\d$/.test(password[j + 1])) {
+                        if (parseInt(password[j]) + 1 === parseInt(password[j + 1])) {
+                            seqLength++;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                maxSequenceLength = Math.max(maxSequenceLength, seqLength);
+            }
+
+            // Secuencias numéricas descendentes
+            for (let i = 0; i <= password.length - 2; i++) {
+                let seqLength = 1;
+                for (let j = i; j < password.length - 1; j++) {
+                    if (/^\d$/.test(password[j]) && /^\d$/.test(password[j + 1])) {
+                        if (parseInt(password[j]) - 1 === parseInt(password[j + 1])) {
+                            seqLength++;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                maxSequenceLength = Math.max(maxSequenceLength, seqLength);
+            }
+
+            // Secuencias alfabéticas ascendentes
+            for (let i = 0; i <= lower.length - 2; i++) {
+                let seqLength = 1;
+                for (let j = i; j < lower.length - 1; j++) {
+                    if (/^[a-z]$/.test(lower[j]) && /^[a-z]$/.test(lower[j + 1])) {
+                        if (lower.charCodeAt(j) + 1 === lower.charCodeAt(j + 1)) {
+                            seqLength++;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                maxSequenceLength = Math.max(maxSequenceLength, seqLength);
+            }
+
+            // Secuencias alfabéticas descendentes
+            for (let i = 0; i <= lower.length - 2; i++) {
+                let seqLength = 1;
+                for (let j = i; j < lower.length - 1; j++) {
+                    if (/^[a-z]$/.test(lower[j]) && /^[a-z]$/.test(lower[j + 1])) {
+                        if (lower.charCodeAt(j) - 1 === lower.charCodeAt(j + 1)) {
+                            seqLength++;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                maxSequenceLength = Math.max(maxSequenceLength, seqLength);
+            }
+
+            // Secuencias de teclado comunes
+            const keyboardSeqs = ['qwerty', 'asdfgh', 'zxcvbn', 'qwertz', 'azerty'];
+            for (const seq of keyboardSeqs) {
+                if (lower.includes(seq)) {
+                    maxSequenceLength = Math.max(maxSequenceLength, seq.length);
+                }
+            }
+
+            return maxSequenceLength;
+        }
+
+        static hasRepeatedChars(password, maxRepeated = 3) {
+            for (let i = 0; i <= password.length - (maxRepeated + 1); i++) {
+                const seq = password.substr(i, maxRepeated + 1);
+                if (new Set(seq).size === 1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        static hasCommonPattern(password) {
+            const lower = password.toLowerCase();
+            const patterns = [
+                'password', 'contraseña', 'contrasenya',
+                '12345', '54321',
+                'admin', 'root', 'user',
+                'qwerty', 'asdfgh',
+                'letmein', 'welcome',
+                'monkey', 'dragon'
+            ];
+            return patterns.some(pattern => lower.includes(pattern));
+        }
+    }
+
+    // Validación en tiempo real
+    const passwordInput = document.getElementById('password');
+    const password2Input = document.getElementById('password2');
+    const strengthDiv = document.getElementById('password-strength');
+    const matchDiv = document.getElementById('password-match');
+    const submitBtn = document.getElementById('submitBtn');
+
+    passwordInput.addEventListener('input', function () {
+        validatePassword();
+        checkPasswordMatch();
+    });
+
+    password2Input.addEventListener('input', checkPasswordMatch);
+
+    function validatePassword() {
+        const password = passwordInput.value;
+
+        if (password.length === 0) {
+            // Ocultar todos los checks cuando no hay contraseña
+            document.getElementById('length-check').style.display = 'none';
+            document.getElementById('uppercase-check').style.display = 'none';
+            document.getElementById('lowercase-check').style.display = 'none';
+            document.getElementById('number-check').style.display = 'none';
+            document.getElementById('special-check').style.display = 'none';
+            document.getElementById('sequence-check').style.display = 'none';
+            document.getElementById('repeated-check').style.display = 'none';
+            document.getElementById('pattern-check').style.display = 'none';
+            strengthDiv.textContent = '';
+            strengthDiv.className = 'mt-2 text-xs sm:text-sm';
+            updateSubmitButton();
+            return false;
+        }
+
+        const maxSeqLength = PasswordValidators.getMaxSequenceLength(password);
+
+        // Requisitos individuales
+        const checks = {
+            length: password.length >= 10,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /\d/.test(password),
+            special: /[!@#$%^&*()_+\-=\[\]{};:'",.<>?/\\|`~]/.test(password),
+            sequence: maxSeqLength <= 3,
+            repeated: !PasswordValidators.hasRepeatedChars(password, 3),
+            pattern: !PasswordValidators.hasCommonPattern(password)
+        };
+
+        // Actualizar checks visuales (solo mostrar los que NO se cumplen)
+        updateCheckVisibility('length-check', checks.length);
+        updateCheckVisibility('uppercase-check', checks.uppercase);
+        updateCheckVisibility('lowercase-check', checks.lowercase);
+        updateCheckVisibility('number-check', checks.number);
+        updateCheckVisibility('special-check', checks.special);
+        updateCheckVisibility('sequence-check', checks.sequence);
+        updateCheckVisibility('repeated-check', checks.repeated);
+        updateCheckVisibility('pattern-check', checks.pattern);
+
+        // Contar cuántos requisitos se cumplen
+        const passedChecks = Object.values(checks).filter(Boolean).length;
+        const allPassed = passedChecks === 8;
+
+        // Determinar nivel de seguridad basado en secuencias
+        let securityLevel = 'strong';
+        if (maxSeqLength >= 7) {
+            securityLevel = 'weak';
+        } else if (maxSeqLength >= 4 && maxSeqLength <= 6) {
+            securityLevel = 'medium';
+        }
+
+        // Mostrar feedback general
+        if (!allPassed) {
+            strengthDiv.textContent = '❌ Contrasenya insegura - No compleix tots els requisits';
+            strengthDiv.className = 'mt-2 text-xs sm:text-sm text-red-600 font-bold';
+        } else if (securityLevel === 'weak') {
+            strengthDiv.textContent = '⚠️ Contrasenya insegura - Seqüències massa llargues';
+            strengthDiv.className = 'mt-2 text-xs sm:text-sm text-red-600 font-bold';
+        } else if (securityLevel === 'medium') {
+            strengthDiv.textContent = '⚠️ Contrasenya de seguretat mitjana';
+            strengthDiv.className = 'mt-2 text-xs sm:text-sm text-yellow-600 font-bold';
+        } else {
+            strengthDiv.textContent = '✓ Contrasenya segura';
+            strengthDiv.className = 'mt-2 text-xs sm:text-sm text-green-600 font-bold';
+        }
+
+        updateSubmitButton();
+        return allPassed && securityLevel !== 'weak';
+    }
+
+    function updateCheckVisibility(elementId, passed) {
+        const element = document.getElementById(elementId);
+        if (passed) {
+            element.style.display = 'none';
+        } else {
+            element.style.display = 'list-item';
+            element.style.color = 'red';
+            element.style.fontWeight = 'bold';
+        }
+    }
+
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const password2 = password2Input.value;
+
+        if (password2.length === 0) {
+            matchDiv.textContent = '';
+            matchDiv.className = 'mt-2 text-xs sm:text-sm';
+            updateSubmitButton();
+            return false;
+        }
+
+        if (password === password2) {
+            matchDiv.textContent = '✓ Les contrasenyes coincideixen';
+            matchDiv.className = 'mt-2 text-xs sm:text-sm text-green-600 font-medium';
+            updateSubmitButton();
+            return true;
+        } else {
+            matchDiv.textContent = '✗ Les contrasenyes no coincideixen';
+            matchDiv.className = 'mt-2 text-xs sm:text-sm text-red-600 font-medium';
+            updateSubmitButton();
+            return false;
+        }
+    }
+
+    function updateSubmitButton() {
+        const password = passwordInput.value;
+        const password2 = password2Input.value;
+        const maxSeqLength = PasswordValidators.getMaxSequenceLength(password);
+
+        const passwordValid = validatePassword();
+        const passwordsMatch = password === password2 && password2.length > 0;
+        const notTooWeak = maxSeqLength < 7;
+
+        if (passwordValid && passwordsMatch && notTooWeak) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('disabled:bg-gray-400', 'disabled:cursor-not-allowed');
+        }
+    }
+
+    // Validación al enviar
+    document.getElementById('registroForm').addEventListener('submit', function(e) {
+        const maxSeqLength = PasswordValidators.getMaxSequenceLength(passwordInput.value);
+        if (!validatePassword() || !checkPasswordMatch() || maxSeqLength >= 7) {
+            e.preventDefault();
+            alert('Si us plau, compleix tots els requisits de la contrasenya abans de continuar.');
+        }
+    });
+</script>
+{% endblock %}

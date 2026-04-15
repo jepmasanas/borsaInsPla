@@ -1,0 +1,264 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    {% load static %}
+    {% load notificaciones_tags %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>{% block title %}EstanyJobs{% endblock %} - Borsa de Treball</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        /* Prevenir scroll horizontal */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        /* Asegurar que todos los contenedores respeten el ancho */
+        * {
+            box-sizing: border-box;
+        }
+        /* Main ocupa el espacio disponible */
+        main {
+            flex: 1;
+        }
+        /* Animación suave para el menú móvil */
+        #mobileMenu {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        #mobileMenu.hidden {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        #mobileMenu:not(.hidden) {
+            max-height: calc(100vh - 3.5rem);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
+            <div class="flex justify-between items-center h-14 sm:h-16">
+                <!-- Logo -->
+                <div class="flex items-center flex-shrink-0 min-w-0">
+                    <a href="{% url 'home' %}" class="flex items-center">
+                        <span class="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600">{% trans "Estany" %}</span>
+                        <span class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800">{% trans "Jobs" %}</span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
+                    <!-- Ajustes -->
+                    <a href="{% url 'ajustes' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                        ⚙️ {% trans "Ajustes" %}
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <span class="text-gray-700 px-3 py-2 text-sm whitespace-nowrap">
+                            Hola, <strong class="max-w-[100px] xl:max-w-[150px] inline-block truncate align-bottom">{{ user.username }}</strong>
+                            {% if user.role == 'admin' %}
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded ml-1">Admin</span>
+                            {% elif user.role == 'empresa' %}
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded ml-1">Empresa</span>
+                            {% elif user.role == 'alumno' %}
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded ml-1">Alumne</span>
+                            {% endif %}
+                        </span>
+
+                        <!-- Notificaciones -->
+                        <a href="{% url 'notificaciones_lista' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium relative whitespace-nowrap transition-colors">
+                            🔔 Notificacions
+                            {% contar_notificaciones_no_leidas user as count_notif %}
+                            {% if count_notif > 0 %}
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                    {{ count_notif|slice:":9" }}
+                                </span>
+                            {% endif %}
+                        </a>
+
+                        {% if user.role == 'admin' %}
+                            <a href="{% url 'estadisticas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                📊 Estadístiques
+                            </a>
+                            <a href="{% url 'admin_validar_empresas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                🏢 Validar Empreses
+                            </a>
+                            <a href="{% url 'admin_validar_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                ✅ Validar Ofertes
+                            </a>
+                        {% elif user.role == 'alumno' %}
+                            <a href="{% url 'alumno_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                📋 Ofertes
+                            </a>
+                            <a href="{% url 'alumno_perfil' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                👤 Perfil
+                            </a>
+                            <a href="{% url 'alumno_inscripciones' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                📝 Inscripcions
+                            </a>
+                        {% elif user.role == 'empresa' %}
+                            <a href="{% url 'empresa_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                📋 Les Meves Ofertes
+                            </a>
+                        {% endif %}
+
+                        <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                            Tancar sessió
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                            Iniciar sessió
+                        </a>
+                        <a href="{% url 'registro' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                            Registrar-se
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile/Tablet menu button -->
+                <div class="flex lg:hidden gap-2 items-center">
+                    {% if user.is_authenticated %}
+                        <!-- Notificaciones visibles en móvil -->
+                        <a href="{% url 'notificaciones_lista' %}" class="text-gray-700 hover:text-blue-600 p-2 relative">
+                            <span class="text-xl">🔔</span>
+                            {% contar_notificaciones_no_leidas user as count_notif %}
+                            {% if count_notif > 0 %}
+                                <span class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                                    {{ count_notif|slice:":9" }}
+                                </span>
+                            {% endif %}
+                        </a>
+                    {% endif %}
+                    <button type="button" onclick="toggleMobileMenu()" class="text-gray-700 hover:text-blue-600 p-2 transition-colors" aria-label="Toggle menu">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-200 bg-white">
+            <div class="px-4 pt-2 pb-3 space-y-1">
+                <!-- Ajustes -->
+                <a href="{% url 'ajustes' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                    ⚙️ {% trans "Ajustes" %}
+                </a>
+
+                {% if user.is_authenticated %}
+                    <div class="px-3 py-2.5 text-gray-700 text-sm border-b border-gray-200 mb-1">
+                        Hola, <strong>{{ user.username }}</strong>
+                        {% if user.role == 'admin' %}
+                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded ml-1">Admin</span>
+                        {% elif user.role == 'empresa' %}
+                            <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded ml-1">Empresa</span>
+                        {% elif user.role == 'alumno' %}
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded ml-1">Alumne</span>
+                        {% endif %}
+                    </div>
+
+                    {% if user.role == 'admin' %}
+                        <a href="{% url 'estadisticas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            📊 Estadístiques
+                        </a>
+                        <a href="{% url 'admin_validar_empresas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            🏢 Validar Empreses
+                        </a>
+                        <a href="{% url 'admin_validar_ofertas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            ✅ Validar Ofertes
+                        </a>
+                    {% elif user.role == 'alumno' %}
+                        <a href="{% url 'alumno_ofertas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            📋 Ofertes
+                        </a>
+                        <a href="{% url 'alumno_perfil' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            👤 Perfil
+                        </a>
+                        <a href="{% url 'alumno_inscripciones' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            📝 Les Meves Inscripcions
+                        </a>
+                    {% elif user.role == 'empresa' %}
+                        <a href="{% url 'empresa_ofertas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            📋 Les Meves Ofertes
+                        </a>
+                    {% endif %}
+
+                    <a href="{% url 'logout' %}" class="block bg-red-500 hover:bg-red-600 text-white px-3 py-2.5 rounded-md text-base font-medium text-center mt-2 transition-colors">
+                        🚪 Tancar sessió
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                        Iniciar sessió
+                    </a>
+                    <a href="{% url 'registro' %}" class="block bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-md text-base font-medium text-center mt-2 transition-colors">
+                        Registrar-se
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 mt-3 sm:mt-4">
+        {% for message in messages %}
+        <div class="{% if message.tags == 'error' %}bg-red-100 border-red-400 text-red-700{% elif message.tags == 'success' %}bg-green-100 border-green-400 text-green-700{% else %}bg-blue-100 border-blue-400 text-blue-700{% endif %} border px-4 py-3 rounded text-sm relative mb-3 transition-all" role="alert">
+            <span class="block sm:inline">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Content -->
+    <main class="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-auto">
+        <div class="container mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-6 lg:py-8">
+            <div class="text-center">
+                <p class="text-gray-400 text-sm lg:text-base">{% trans "&copy; 2025 EstanyJobs - Institut Pla de l'Estany" %}</p>
+                <p class="text-gray-500 text-xs lg:text-sm mt-2">{% trans "Projecte Final DAM 2025-26" %}</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('mobileMenu');
+            const button = event.target.closest('button[onclick="toggleMobileMenu()"]');
+
+            if (!menu.contains(event.target) && !button && !menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // Cerrar menú al cambiar tamaño de ventana a desktop
+        window.addEventListener('resize', function() {
+            const menu = document.getElementById('mobileMenu');
+            if (window.innerWidth >= 1024 && !menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

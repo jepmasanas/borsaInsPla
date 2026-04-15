@@ -1,0 +1,130 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}Inici{% endblock %}
+
+{% block content %}
+<div class="container mx-auto">
+    <!-- Hero Section -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg sm:rounded-xl shadow-xl p-6 sm:p-8 lg:p-12 mb-8 sm:mb-10 lg:mb-12 text-white">
+        <div class="text-center">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
+                {% trans "Borsa de Treball" %}
+            </h1>
+            <h2 class="text-xl sm:text-2xl font-light mb-4 sm:mb-6">
+                {% trans "Institut Pla de l'Estany" %}
+            </h2>
+            <p class="text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
+                Connectem alumnes i exalumnes amb empreses col·laboradores
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
+                {% if not user.is_authenticated %}
+                <a href="{% url 'registro' %}" class="w-full sm:w-auto bg-white text-blue-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition text-center text-sm sm:text-base">
+                    Registrar-se
+                </a>
+                <a href="{% url 'login' %}" class="w-full sm:w-auto bg-blue-500 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-blue-400 transition text-center text-sm sm:text-base">
+                    Iniciar sessió
+                </a>
+                {% else %}
+                <a href="{% url 'dashboard' %}" class="w-full sm:w-auto bg-white text-blue-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-gray-100 transition text-center text-sm sm:text-base">
+                    Anar al Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8 mb-8 sm:mb-10 lg:mb-12">
+        <div class="bg-white p-5 sm:p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
+            <div class="text-4xl sm:text-5xl mb-3 sm:mb-4">{% trans "🎓" %}</div>
+            <h3 class="text-lg sm:text-xl font-bold mb-2">{% trans "Per Alumnes" %}</h3>
+            <p class="text-sm sm:text-base text-gray-600">
+                {% trans "Troba oportunitats laborals adaptades al teu perfil professional" %}
+            </p>
+        </div>
+        <div class="bg-white p-5 sm:p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow">
+            <div class="text-4xl sm:text-5xl mb-3 sm:mb-4">{% trans "🏢" %}</div>
+            <h3 class="text-lg sm:text-xl font-bold mb-2">{% trans "Per Empreses" %}</h3>
+            <p class="text-sm sm:text-base text-gray-600">
+                {% trans "Publica ofertes i troba talent format a l'institut" %}
+            </p>
+        </div>
+        <div class="bg-white p-5 sm:p-6 rounded-lg shadow-md text-center hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1">
+            <div class="text-4xl sm:text-5xl mb-3 sm:mb-4">{% trans "✅" %}</div>
+            <h3 class="text-lg sm:text-xl font-bold mb-2">{% trans "Validat" %}</h3>
+            <p class="text-sm sm:text-base text-gray-600">
+                {% trans "Totes les ofertes són validades per l'administració" %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Ofertas Recientes -->
+    {% if ofertas_recientes %}
+    <div class="mb-8 sm:mb-10 lg:mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-5 sm:mb-6 text-gray-800">
+            {% trans "Ofertes Recents" %}
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+            {% for oferta in ofertas_recientes %}
+            <div class="bg-white rounded-lg shadow-md p-5 sm:p-6 hover:shadow-lg transition-shadow flex flex-col">
+                <h3 class="text-lg sm:text-xl font-bold mb-2 text-gray-800 line-clamp-2">
+                    {{ oferta.titulo }}
+                </h3>
+                <p class="text-sm sm:text-base text-gray-600 mb-3">
+                    {{ oferta.empresa.nombre_empresa }}
+                </p>
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="bg-blue-100 text-blue-800 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium">
+                        {{ oferta.get_modalidad_display }}
+                    </span>
+                    <span class="bg-green-100 text-green-800 px-2.5 sm:px-3 py-1 rounded-full text-xs font-medium">
+                        {{ oferta.get_tipo_contrato_display }}
+                    </span>
+                </div>
+                <p class="text-gray-600 text-xs sm:text-sm mb-4 flex-grow line-clamp-3">
+                    {{ oferta.descripcion|truncatewords:20 }}
+                </p>
+                {% if user.is_authenticated and user.role == 'alumno' %}
+                <a href="{% url 'alumno_detalle_oferta' oferta.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition text-center text-sm font-medium mt-auto">
+                    Veure més
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- CTA Section -->
+    <div class="bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg sm:rounded-xl p-6 sm:p-8 lg:p-10 text-center shadow-md">
+        <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold mb-3 sm:mb-4 text-gray-800">
+            {% trans "Comença ara!" %}
+        </h2>
+        <p class="text-sm sm:text-base lg:text-lg text-gray-600 mb-5 sm:mb-6 max-w-2xl mx-auto px-4">
+            {% trans "Registra't i troba la teva propera oportunitat professional" %}
+        </p>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'registro' %}" class="inline-block bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-sm sm:text-base">
+            Crear compte gratuït
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Utilidad para limitar líneas de texto */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

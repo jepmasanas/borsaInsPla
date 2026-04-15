@@ -1,0 +1,198 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}Validar empreses{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 py-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+            <div class="flex-1 min-w-0">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 break-words">{% trans "Validar empreses" %}</h1>
+                <p class="text-gray-600 mt-2 text-sm sm:text-base">{% trans "Gestió d'empreses pendents de validació" %}</p>
+            </div>
+            <div class="flex flex-col xs:flex-row gap-2 xs:gap-3 flex-shrink-0">
+                <a href="/admin/" class="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 transition text-xs sm:text-sm font-medium text-center whitespace-nowrap">
+                    🏠 Panel Admin Django
+                </a>
+                <a href="{% url 'admin_validar_ofertas' %}" class="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition text-xs sm:text-sm font-medium text-center whitespace-nowrap">
+                    📋 Validar ofertes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if empresas %}
+    <div class="space-y-4 sm:space-y-6">
+        {% for empresa in empresas %}
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
+            <div class="p-4 sm:p-6 flex flex-col">
+                <!-- Header: Logo y nombre -->
+                <div class="flex flex-col xs:flex-row xs:items-start gap-3 xs:gap-4 mb-4 sm:mb-6">
+                    {% if empresa.logo %}
+                    <img src="{{ empresa.logo.url }}" alt="Logo" class="w-12 xs:w-14 sm:w-16 h-12 xs:h-14 sm:h-16 object-contain rounded flex-shrink-0">
+                    {% else %}
+                    <div class="w-12 xs:w-14 sm:w-16 h-12 xs:h-14 sm:h-16 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center text-xl xs:text-2xl">
+                        🏢
+                    </div>
+                    {% endif %}
+
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-lg sm:text-2xl lg:text-3xl font-bold text-gray-800 break-words">{{ empresa.nombre_empresa }}</h3>
+                        <p class="text-xs sm:text-sm text-gray-600 truncate">CIF: {{ empresa.cif }}</p>
+                    </div>
+                </div>
+
+                <!-- Info grid -->
+                <div class="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3 sm:gap-4 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-gray-200">
+                    <div>
+                        <p class="text-xs sm:text-sm text-gray-500 font-medium">{% trans "Usuari:" %}</p>
+                        <p class="text-xs sm:text-sm text-gray-800 break-words">{{ empresa.user.username }}</p>
+                        <a href="mailto:{{ empresa.user.email }}" class="text-xs sm:text-sm text-blue-600 hover:underline break-all">{{ empresa.user.email }}</a>
+                    </div>
+
+                    {% if empresa.sector %}
+                    <div>
+                        <p class="text-xs sm:text-sm text-gray-500 font-medium">{% trans "Sector:" %}</p>
+                        <p class="text-xs sm:text-sm text-gray-800">{{ empresa.sector }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if empresa.direccion %}
+                    <div>
+                        <p class="text-xs sm:text-sm text-gray-500 font-medium">{% trans "Direcció:" %}</p>
+                        <p class="text-xs sm:text-sm text-gray-800 break-words">{{ empresa.direccion }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if empresa.web %}
+                    <div>
+                        <p class="text-xs sm:text-sm text-gray-500 font-medium">{% trans "Web:" %}</p>
+                        <a href="{{ empresa.web }}" target="_blank" class="text-xs sm:text-sm text-blue-600 hover:text-blue-700 underline break-all">
+                            {{ empresa.web }}
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Descripción -->
+                {% if empresa.descripcion %}
+                <div class="mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-gray-200">
+                    <p class="text-xs sm:text-sm text-gray-500 font-medium mb-1.5">{% trans "Descripció:" %}</p>
+                    <p class="text-xs sm:text-sm lg:text-base text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-4">{{ empresa.descripcion }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Fecha registro -->
+                <div class="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
+                    📅 Registrada el {{ empresa.fecha_registro|date:"d/m/Y" }}
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex flex-col xs:flex-row gap-2 xs:gap-3">
+                    <form method="post" action="{% url 'admin_validar_empresas' %}" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="empresa_id" value="{{ empresa.id }}">
+                        <input type="hidden" name="action" value="validar">
+                        <button
+                            type="submit"
+                            class="w-full bg-green-600 text-white px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-green-700 active:bg-green-800 transition font-semibold text-sm sm:text-base"
+                        >
+                            ✓ Validar
+                        </button>
+                    </form>
+
+                    <form method="post" action="{% url 'admin_validar_empresas' %}" class="flex-1" onsubmit="return confirm('Segur que vols rebutjar aquesta empresa?');">
+                        {% csrf_token %}
+                        <input type="hidden" name="empresa_id" value="{{ empresa.id }}">
+                        <input type="hidden" name="action" value="rechazar">
+                        <button
+                            type="submit"
+                            class="w-full bg-red-600 text-white px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-red-700 active:bg-red-800 transition font-semibold text-sm sm:text-base"
+                        >
+                            ✗ Rebutjar
+                        </button>
+                    </form>
+
+                    <a
+                        href="/admin/core/perfilempresa/{{ empresa.id }}/change/"
+                        target="_blank"
+                        class="flex-1 bg-gray-100 text-gray-700 px-3 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition font-semibold text-center text-sm sm:text-base whitespace-nowrap"
+                    >
+                        ⚙️ Editar
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-6 sm:mt-8 text-center text-gray-600 text-sm">
+        <p>{{ empresas.count }} empreses pendents de validació</p>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-6 sm:p-8 lg:p-12 text-center">
+        <div class="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">✓</div>
+        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-2 break-words">{% trans "No hi ha empreses pendents" %}</h3>
+        <p class="text-xs sm:text-sm lg:text-base text-gray-600 mb-6">{% trans "Totes les empreses han estat validades" %}</p>
+        <a href="/admin/" class="text-blue-600 hover:text-blue-700 font-medium text-sm">
+            Tornar al panel d'administració
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    h1 {
+        font-size: clamp(1.5rem, 5vw, 2.25rem);
+        line-height: 1.2;
+    }
+
+    h3 {
+        font-size: clamp(1.125rem, 3vw, 1.875rem);
+        line-height: 1.2;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-4 {
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    button, a {
+        transition: all 150ms ease-in-out;
+    }
+
+    @media (max-width: 640px) {
+        button, a {
+            min-height: 44px;
+            font-size: 16px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+        }
+    }
+</style>
+{% endblock %}

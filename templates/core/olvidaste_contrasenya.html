@@ -1,0 +1,87 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Recuperar Contrasenya" %}{% endblock %}
+
+{% block content %}
+<div class="w-full min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-sm bg-white rounded-lg shadow-lg p-6">
+
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                <span class="text-3xl">🔑</span>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">
+                {% trans "Recuperar Contrasenya" %}
+            </h2>
+            <p class="text-sm text-gray-600 mt-2">
+                {% trans "Introdueix el teu email o nom d'usuari" %}
+            </p>
+        </div>
+
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="p-3 rounded-lg text-sm {% if message.tags %}bg-{{ message.tags }}-50 text-{{ message.tags }}-700{% else %}bg-blue-50 text-blue-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="email_or_username" class="block text-sm font-medium text-gray-700 mb-1">
+                    {% trans "Email o Nom d'usuari" %}
+                </label>
+                <input
+                    type="text"
+                    name="email_or_username"
+                    id="email_or_username"
+                    required
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                    placeholder="{% trans "Email o nom d'usuari" %}"
+                    autofocus
+                >
+            </div>
+
+            <button
+                type="submit"
+                class="w-full bg-red-600 hover:bg-red-700 text-white py-2.5 text-sm font-semibold rounded-lg transition shadow-md hover:shadow-lg"
+            >
+                {% trans "Enviar Codi de Recuperació" %}
+            </button>
+        </form>
+
+        <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300"></div>
+            </div>
+            <div class="relative flex justify-center text-xs">
+                <span class="px-2 bg-white text-gray-500">O</span>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <p class="text-sm text-gray-600 text-center">
+                Recorces el teu compte?
+                <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
+                    Inicia sessió
+                </a>
+            </p>
+            <p class="text-sm text-gray-600 text-center">
+                Encara no tens compte?
+                <a href="{% url 'registro' %}" class="text-blue-600 hover:text-blue-700 font-semibold hover:underline">
+                    Registra't aquí
+                </a>
+            </p>
+        </div>
+
+        <p class="text-xs text-gray-400 text-center mt-6">
+            Rebràs un email amb les instruccions per recuperar la contrasenya.
+        </p>
+    </div>
+</div>
+{% endblock %}

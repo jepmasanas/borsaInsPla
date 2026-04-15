@@ -1,0 +1,97 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Establir Nova Contrasenya" %}{% endblock %}
+
+{% block content %}
+<div class="w-full min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-sm bg-white rounded-lg shadow-lg p-6">
+
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                <span class="text-3xl">✅</span>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">
+                {% trans "Establir Nova Contrasenya" %}
+            </h2>
+            <p class="text-sm text-gray-600 mt-2">
+                {% trans "Crea una nova contrasenya segura" %}
+            </p>
+        </div>
+
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="p-3 rounded-lg text-sm {% if message.tags %}bg-{{ message.tags }}-50 text-{{ message.tags }}-700{% else %}bg-blue-50 text-blue-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded">
+            <p class="text-sm text-green-700">
+                ✓ {% trans "Codi verificat correctament" %}
+            </p>
+            <p class="text-xs text-green-600 mt-2">
+                {% trans "Ara pots establir la teva nova contrasenya" %}
+            </p>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
+                    {% trans "Nova Contrasenya" %}
+                </label>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    required
+                    minlength="10"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                    placeholder="{% trans "Almenys 10 caràcters" %}"
+                >
+                <p class="text-xs text-gray-500 mt-1">
+                    {% trans "• Mínim 10 caràcters" %}<br>
+                    {% trans "• Mayúscules, minúscules, números i símbols" %}
+                </p>
+            </div>
+
+            <div>
+                <label for="password2" class="block text-sm font-medium text-gray-700 mb-1">
+                    {% trans "Repetir Contrasenya" %}
+                </label>
+                <input
+                    type="password"
+                    name="password2"
+                    id="password2"
+                    required
+                    minlength="10"
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                    placeholder="{% trans "Repeteix la contrasenya" %}"
+                >
+            </div>
+
+            <button
+                type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 text-sm font-semibold rounded-lg transition shadow-md hover:shadow-lg"
+            >
+                {% trans "Actualitzar Contrasenya" %}
+            </button>
+        </form>
+
+        <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+            <p class="text-xs text-yellow-700">
+                🔒 {% trans "Assegura't que és una contrasenya forta i única. No la comparteixis amb ningú." %}
+            </p>
+        </div>
+
+        <p class="text-xs text-gray-400 text-center mt-6">
+            {% trans "Després de canviar la contrasenya, hauràs d'iniciar sessió de nou." %}
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1070 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.db.models import Q
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
+from .models import (
+    User, PerfilEmpresa, PerfilAlumno, Oferta, Inscripcion,
+    EmailVerification, PasswordRecovery, Notificacion
+)
+from .utils import send_verification_email, send_password_recovery_email, send_welcome_email
+import json
+
+
+def home(request):
+    """Página de inicio pública"""
+    ofertas_recientes = Oferta.objects.filter(validada=True, activa=True)[:6]
+    context = {
+        'ofertas_recientes': ofertas_recientes
+    }
+    return render(request, 'core/home.html', context)
+
+
+# ==================== REGISTRO Y VERIFICACIÓN ====================
+
+def registro(request):
+    """Registro de nuevos usuarios con verificación de email"""
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        role = request.POST.get('role')
+
+        # Validaciones básicas
+        if not username or not email or not password:
+            messages.error(request, 'Tots els camps obligatoris són necessaris.')
+            return redirect('registro')
+
+        if password != password2:
+            messages.error(request, 'Les contrasenyes no coincideixen.')
+            return redirect('registro')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Aquest nom d\'usuari ja existeix.')
+            return redirect('registro')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Aquest email ja està registrat.')
+            return redirect('registro')
+
+        # Validar contraseña segura
+        try:
+            validate_password(password, user=None)
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
+            return redirect('registro')
+
+        # Validaciones específicas por rol
+        if role == 'empresa':
+            nombre_empresa = request.POST.get('nombre_empresa', '').strip()
+            cif = request.POST.get('cif', '').strip()
+
+            if not nombre_empresa or not cif:
+                messages.error(request, 'Nom d\'empresa i CIF són obligatoris.')
+                return redirect('registro')
+
+            if PerfilEmpresa.objects.filter(cif=cif).exists():
+                messages.error(request, 'Aquest CIF ja està registrat.')
+                return redirect('registro')
+
+        elif role == 'alumno':
+            nom_complet = request.POST.get('nom_complet', '').strip()
+            cicle = request.POST.get('cicle', '')
+            any_graduacio = request.POST.get('any_graduacio', '')
+
+            if not nom_complet or not cicle or not any_graduacio:
+                messages.error(request, 'Tots els camps d\'alumne són obligatoris.')
+                return redirect('registro')
+
+            try:
+                any_graduacio = int(any_graduacio)
+                if any_graduacio < 2020 or any_graduacio > 2030:
+                    messages.error(request, 'Any de graduació no vàlid.')
+                    return redirect('registro')
+            except ValueError:
+                messages.error(request, 'Any de graduació ha de ser un número.')
+                return redirect('registro')
+
+        # Crear usuario (INACTIVO hasta verificar email)
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            role=role,
+            is_active=False
+        )
+
+        # Crear perfil según rol
+        if role == 'empresa':
+            PerfilEmpresa.objects.create(
+                user=user,
+                nombre_empresa=request.POST.get('nombre_empresa', '').strip(),
+                cif=request.POST.get('cif', '').strip()
+            )
+        elif role == 'alumno':
+            PerfilAlumno.objects.create(
+                user=user,
+                nom_complet=request.POST.get('nom_complet', '').strip(),
+                cicle=request.POST.get('cicle', 'DAM'),
+                any_graduacio=int(request.POST.get('any_graduacio', 2025))
+            )
+
+        # Crear código de verificación
+        EmailVerification.objects.filter(user=user).delete()
+        verification = EmailVerification.objects.create(user=user)
+
+        # Enviar email
+        if send_verification_email(user, verification.code):
+            messages.success(
+                request,
+                f'✅ Registre creat! Revisa el teu email ({email}) per verificar el compte.'
+            )
+            request.session['pending_user_id'] = user.id
+            return redirect('verificar_email')
+        else:
+            messages.error(request, '❌ Error enviant l\'email. Contacta amb l\'administrador.')
+            user.delete()
+            return redirect('registro')
+
+    return render(request, 'core/registro.html')
+
+
+def verificar_email(request):
+    """Vista para introducir el código de verificación"""
+    user_id = request.session.get('pending_user_id')
+
+    if not user_id:
+        messages.error(request, 'Sessió expirada. Si us plau, torna a registrar-te.')
+        return redirect('registro')
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'Usuari no trobat.')
+        return redirect('registro')
+
+    if request.method == 'POST':
+        code = request.POST.get('code', '').strip()
+
+        try:
+            verification = EmailVerification.objects.get(user=user)
+
+            if not verification.is_valid():
+                messages.error(request, 'El codi ha expirat. Sol·licita un nou codi.')
+                return redirect('verificar_email')
+
+            if verification.code == code:
+                # ✅ VERIFICAR QUE EL PERFIL EXISTE
+                if user.role == 'empresa':
+                    if not hasattr(user, 'perfil_empresa'):
+                        messages.error(request, 'Error: perfil d\'empresa no trobat. Contacta amb l\'administrador.')
+                        return redirect('verificar_email')
+                elif user.role == 'alumno':
+                    if not hasattr(user, 'perfil_alumno'):
+                        messages.error(request, 'Error: perfil d\'alumne no trobat. Contacta amb l\'administrador.')
+                        return redirect('verificar_email')
+
+                # Activar usuario
+                user.is_active = True
+                user.email_verified = True
+                user.save()
+
+                # Eliminar código usado
+                verification.delete()
+
+                # Enviar email de bienvenida
+                send_welcome_email(user)
+
+                # Limpiar sesión
+                del request.session['pending_user_id']
+
+                messages.success(request, '✅ Email verificat correctament! Ja pots iniciar sessió.')
+                return redirect('login')
+            else:
+                messages.error(request, '❌ Codi incorrecte. Torna-ho a provar.')
+        except EmailVerification.DoesNotExist:
+            messages.error(request, 'No s\'ha trobat cap codi de verificació.')
+
+    context = {'user_email': user.email}
+    return render(request, 'core/verificar_email.html', context)
+
+
+def reenviar_codigo(request):
+    """Reenviar código de verificación"""
+    user_id = request.session.get('pending_user_id')
+
+    if not user_id:
+        messages.error(request, 'Sessió expirada.')
+        return redirect('registro')
+
+    try:
+        user = User.objects.get(id=user_id)
+
+        # Verificar que no sea muy frecuente (máximo cada 60 segundos)
+        try:
+            verification = EmailVerification.objects.get(user=user)
+            time_since_creation = timezone.now() - verification.created_at
+
+            if time_since_creation.total_seconds() < 60:
+                messages.warning(request, '⏳ Espera 60 segons abans de reenviar un altre codi.')
+                return redirect('verificar_email')
+        except EmailVerification.DoesNotExist:
+            pass
+
+        # Eliminar código anterior
+        EmailVerification.objects.filter(user=user).delete()
+
+        # Crear nuevo código
+        verification = EmailVerification.objects.create(user=user)
+
+        # Enviar email
+        if send_verification_email(user, verification.code):
+            messages.success(request, '✅ S\'ha enviat un nou codi al teu email.')
+        else:
+            messages.error(request, '❌ Error enviant l\'email. Torna-ho a provar.')
+    except User.DoesNotExist:
+        messages.error(request, 'Usuari no trobat.')
+        return redirect('registro')
+
+    return redirect('verificar_email')
+
+
+# ==================== RECUPERACIÓN DE CONTRASEÑA ====================
+
+def olvidaste_contrasenya(request):
+    """Solicitar recuperación de contraseña - Paso 1"""
+    if request.method == 'POST':
+        email_or_username = request.POST.get('email_or_username', '').strip()
+
+        if not email_or_username:
+            messages.error(request, 'Si us plau, introdueix un email o nom d\'usuari.')
+            return render(request, 'core/olvidaste_contrasenya.html')
+
+        # ✅ Buscar usuario con Q objects (simplificado)
+        try:
+            user = User.objects.get(
+                Q(email__iexact=email_or_username) | Q(username__iexact=email_or_username)
+            )
+        except User.DoesNotExist:
+            # Por seguridad, no revelar si existe o no
+            messages.info(
+                request,
+                '✉️ Si aquest compte existeix, rebràs un email amb les instruccions de recuperació.'
+            )
+            return render(request, 'core/olvidaste_contrasenya.html')
+        except User.MultipleObjectsReturned:
+            user = User.objects.filter(
+                Q(email__iexact=email_or_username) | Q(username__iexact=email_or_username)
+            ).first()
+
+        # Crear código de recuperación
+        PasswordRecovery.objects.filter(user=user).delete()
+        recovery = PasswordRecovery.objects.create(user=user)
+
+        # Enviar email
+        if send_password_recovery_email(user, recovery.code):
+            messages.success(
+                request,
+                f'✅ Email de recuperació enviat a {user.email}. Revisa-ho en els pròxims 30 minuts.'
+            )
+            request.session['recovery_user_id'] = user.id
+            return redirect('verificar_codigo_recuperacion')
+        else:
+            messages.error(request, '❌ Error enviant l\'email. Torna-ho a provar.')
+
+    return render(request, 'core/olvidaste_contrasenya.html')
+
+
+def verificar_codigo_recuperacion(request):
+    """Verificar código de recuperación - Paso 2"""
+    user_id = request.session.get('recovery_user_id')
+
+    if not user_id:
+        messages.error(request, 'Sessió expirada.')
+        return redirect('olvidaste_contrasenya')
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'Usuari no trobat.')
+        return redirect('olvidaste_contrasenya')
+
+    if request.method == 'POST':
+        code = request.POST.get('code', '').strip()
+
+        try:
+            recovery = PasswordRecovery.objects.get(user=user)
+
+            if not recovery.is_valid():
+                messages.error(request, 'El codi ha expirat. Sol·licita un altre.')
+                return redirect('olvidaste_contrasenya')
+
+            if recovery.code == code:
+                request.session['recovery_verified'] = True
+                messages.success(request, '✅ Codi verificat. Ara crea una nova contrasenya.')
+                return redirect('cambiar_contrasenya_recuperacion')
+            else:
+                messages.error(request, '❌ Codi incorrecte.')
+        except PasswordRecovery.DoesNotExist:
+            messages.error(request, 'No s\'ha trobat cap codi de recuperació.')
+
+    context = {'user_email': user.email}
+    return render(request, 'core/verificar_codigo_recuperacion.html', context)
+
+
+def reenviar_codigo_recuperacion(request):
+    """Reenviar código de recuperación"""
+    user_id = request.session.get('recovery_user_id')
+
+    if not user_id:
+        messages.error(request, 'Sessió expirada.')
+        return redirect('olvidaste_contrasenya')
+
+    try:
+        user = User.objects.get(id=user_id)
+
+        try:
+            recovery = PasswordRecovery.objects.get(user=user)
+            time_since_creation = timezone.now() - recovery.created_at
+
+            if time_since_creation.total_seconds() < 60:
+                messages.warning(request, '⏳ Espera 60 segons abans de reenviar un altre codi.')
+                return redirect('verificar_codigo_recuperacion')
+        except PasswordRecovery.DoesNotExist:
+            pass
+
+        PasswordRecovery.objects.filter(user=user).delete()
+        recovery = PasswordRecovery.objects.create(user=user)
+
+        if send_password_recovery_email(user, recovery.code):
+            messages.success(request, '✅ S\'ha enviat un nou codi.')
+        else:
+            messages.error(request, '❌ Error enviant l\'email.')
+    except User.DoesNotExist:
+        messages.error(request, 'Usuari no trobat.')
+        return redirect('olvidaste_contrasenya')
+
+    return redirect('verificar_codigo_recuperacion')
+
+
+def cambiar_contrasenya_recuperacion(request):
+    """Cambiar contraseña - Paso 3"""
+    user_id = request.session.get('recovery_user_id')
+    recovery_verified = request.session.get('recovery_verified')
+
+    if not user_id or not recovery_verified:
+        messages.error(request, 'Procés invàlid. Si us plau, comença de nou.')
+        return redirect('olvidaste_contrasenya')
+
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, 'Usuari no trobat.')
+        return redirect('olvidaste_contrasenya')
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        if not password or not password2:
+            messages.error(request, 'Tots els camps són obligatoris.')
+            return redirect('cambiar_contrasenya_recuperacion')
+
+        if password != password2:
+            messages.error(request, 'Les contrasenyes no coincideixen.')
+            return redirect('cambiar_contrasenya_recuperacion')
+
+        try:
+            validate_password(password, user=user)
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)
+            return redirect('cambiar_contrasenya_recuperacion')
+
+        # Cambiar contraseña y activar cuenta
+        user.set_password(password)
+        user.is_active = True
+        user.email_verified = True
+        user.save()
+
+        # Limpiar tokens y sesiones
+        EmailVerification.objects.filter(user=user).delete()
+        PasswordRecovery.objects.filter(user=user).delete()
+
+        del request.session['recovery_user_id']
+        del request.session['recovery_verified']
+
+        if 'pending_user_id' in request.session:
+            del request.session['pending_user_id']
+
+        messages.success(request, '✅ Contrasenya canviada i compte verificat correctament. Ja pots iniciar sessió.')
+        return redirect('login')
+
+    context = {'user_email': user.email}
+    return render(request, 'core/cambiar_contrasenya_recuperacion.html', context)
+
+
+# ==================== LOGIN / LOGOUT ====================
+
+def login_view(request):
+    """Login de usuarios"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            if not user.is_active:
+                messages.error(request, 'Aquesta compte està desactivada.')
+                return redirect('login')
+
+            if not user.email_verified:
+                messages.warning(request, 'Si us plau, verifica el teu email primer.')
+                request.session['pending_user_id'] = user.id
+                return redirect('verificar_email')
+
+            login(request, user)
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Credencials incorrectes.')
+
+    return render(request, 'core/login.html')
+
+
+@login_required
+def logout_view(request):
+    """Logout de usuarios"""
+    logout(request)
+    messages.success(request, 'Sessió tancada correctament.')
+    return redirect('home')
+
+
+# ==================== DASHBOARD ====================
+
+@login_required
+def dashboard(request):
+    """Dashboard principal que redirige según el rol"""
+    user = request.user
+
+    # ✅ Verificar que el perfil existe antes de redirigir
+    if user.role == 'admin':
+        return redirect('estadisticas')
+    elif user.role == 'empresa':
+        if not hasattr(user, 'perfil_empresa'):
+            messages.error(request, '❌ El teu perfil d\'empresa no existeix. Contacta amb l\'administrador.')
+            logout(request)
+            return redirect('home')
+        return redirect('empresa_ofertas')
+    elif user.role == 'alumno':
+        if not hasattr(user, 'perfil_alumno'):
+            messages.error(request, '❌ El teu perfil d\'alumne no existeix. Contacta amb l\'administrador.')
+            logout(request)
+            return redirect('home')
+        return redirect('alumno_ofertas')
+    else:
+        return redirect('home')
+
+
+def estadisticas(request):
+    """Página de estadísticas del sistema"""
+    total_usuarios = User.objects.count()
+    total_alumnos = User.objects.filter(role='alumno').count()
+    total_empresas = User.objects.filter(role='empresa').count()
+    total_ofertas = Oferta.objects.count()
+    ofertas_activas = Oferta.objects.filter(activa=True, validada=True).count()
+    total_inscripciones = Inscripcion.objects.count()
+
+    tasa_actividad = round((ofertas_activas * 100) / total_ofertas) if total_ofertas > 0 else 0
+
+    inscripciones_por_tipo = {}
+    for tipo_key, tipo_label in Oferta.TIPO_CONTRATO_CHOICES:
+        count = Oferta.objects.filter(tipo_contrato=tipo_key, validada=True, activa=True).count()
+        inscripciones_por_tipo[str(tipo_label)] = count
+
+    por_modalidad = {}
+    for modal_key, modal_label in Oferta.MODALIDAD_CHOICES:
+        count = Oferta.objects.filter(modalidad=modal_key, validada=True, activa=True).count()
+        por_modalidad[str(modal_label)] = count
+
+    por_ciclo = {}
+    for ciclo_key, ciclo_label in PerfilAlumno.CICLO_CHOICES:
+        count = PerfilAlumno.objects.filter(cicle=ciclo_key).count()
+        if count > 0:
+            por_ciclo[str(ciclo_label)] = count
+
+    estado_inscripciones = {}
+    for estado_key, estado_label in Inscripcion.ESTADO_CHOICES:
+        count = Inscripcion.objects.filter(estado=estado_key).count()
+        estado_inscripciones[str(estado_label)] = count
+
+    context = {
+        'total_usuarios': total_usuarios,
+        'total_alumnos': total_alumnos,
+        'total_empresas': total_empresas,
+        'total_ofertas': total_ofertas,
+        'ofertas_activas': ofertas_activas,
+        'total_inscripciones': total_inscripciones,
+        'tasa_actividad': tasa_actividad,
+        'inscripciones_por_tipo_labels': json.dumps(list(inscripciones_por_tipo.keys())),
+        'inscripciones_por_tipo_values': json.dumps(list(inscripciones_por_tipo.values())),
+        'por_modalidad_labels': json.dumps(list(por_modalidad.keys())),
+        'por_modalidad_values': json.dumps(list(por_modalidad.values())),
+        'por_ciclo_labels': json.dumps(list(por_ciclo.keys())),
+        'por_ciclo_values': json.dumps(list(por_ciclo.values())),
+        'estado_inscripciones_labels': json.dumps(list(estado_inscripciones.keys())),
+        'estado_inscripciones_values': json.dumps(list(estado_inscripciones.values())),
+        'por_ciclo': por_ciclo,
+    }
+
+    return render(request, 'core/estadisticas.html', context)
+
+
+# ==================== VISTAS EMPRESA ====================
+
+@login_required
+def empresa_ofertas(request):
+    """Dashboard empresa - Listado de ofertas propias"""
+    if request.user.role != 'empresa':
+        messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
+        return redirect('home')
+
+    # ✅ Verificar que el perfil existe
+    try:
+        perfil = request.user.perfil_empresa
+    except PerfilEmpresa.DoesNotExist:
+        messages.error(request, '❌ El teu perfil d\'empresa no existeix. Contacta amb l\'administrador.')
+        logout(request)
+        return redirect('home')
+
+    ofertas = perfil.ofertas.all()
+
+    context = {
+        'perfil': perfil,
+        'ofertas': ofertas
+    }
+    return render(request, 'core/empresa/ofertas.html', context)
+
+
+@login_required
+def empresa_nueva_oferta(request):
+    """Crear nueva oferta"""
+    if request.user.role != 'empresa':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    try:
+        perfil = request.user.perfil_empresa
+    except PerfilEmpresa.DoesNotExist:
+        messages.error(request, '❌ El teu perfil d\'empresa no existeix.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        Oferta.objects.create(
+            empresa=perfil,
+            titulo=request.POST.get('titulo'),
+            descripcion=request.POST.get('descripcion'),
+            requisitos=request.POST.get('requisitos'),
+            modalidad=request.POST.get('modalidad'),
+            tipo_contrato=request.POST.get('tipo_contrato'),
+            ubicacion=request.POST.get('ubicacion', ''),
+            salario=request.POST.get('salario', ''),
+        )
+
+        messages.success(request, 'Oferta creada correctament. Pendent de validació.')
+        return redirect('empresa_ofertas')
+
+    return render(request, 'core/empresa/nueva_oferta.html')
+
+
+@login_required
+def empresa_editar_oferta(request, pk):
+    """Editar oferta existente"""
+    oferta = get_object_or_404(Oferta, pk=pk, empresa__user=request.user)
+
+    if request.method == 'POST':
+        oferta.titulo = request.POST.get('titulo')
+        oferta.descripcion = request.POST.get('descripcion')
+        oferta.requisitos = request.POST.get('requisitos')
+        oferta.modalidad = request.POST.get('modalidad')
+        oferta.tipo_contrato = request.POST.get('tipo_contrato')
+        oferta.ubicacion = request.POST.get('ubicacion', '')
+        oferta.salario = request.POST.get('salario', '')
+        oferta.save()
+
+        messages.success(request, 'Oferta actualitzada correctament.')
+        return redirect('empresa_ofertas')
+
+    context = {'oferta': oferta}
+    return render(request, 'core/empresa/editar_oferta.html', context)
+
+
+@login_required
+def empresa_eliminar_oferta(request, pk):
+    """Eliminar oferta"""
+    oferta = get_object_or_404(Oferta, pk=pk, empresa__user=request.user)
+
+    if request.method == 'POST':
+        oferta.delete()
+        messages.success(request, 'Oferta eliminada correctament.')
+
+    return redirect('empresa_ofertas')
+
+
+@login_required
+def empresa_ver_candidatos(request, pk):
+    """Ver todos los candidatos inscritos en una oferta"""
+    if request.user.role != 'empresa':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    oferta = get_object_or_404(Oferta, pk=pk, empresa__user=request.user)
+    inscripciones = oferta.inscripciones.all().select_related('alumno', 'alumno__user')
+
+    estado_filter = request.GET.get('estado', '')
+    if estado_filter:
+        inscripciones = inscripciones.filter(estado=estado_filter)
+
+    context = {
+        'oferta': oferta,
+        'inscripciones': inscripciones,
+        'estado_filter': estado_filter,
+    }
+    return render(request, 'core/empresa/ver_candidatos.html', context)
+
+
+@login_required
+def empresa_cambiar_estado_inscripcion(request, pk):
+    """Cambiar el estado de una inscripción"""
+    if request.user.role != 'empresa':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        inscripcion = get_object_or_404(
+            Inscripcion,
+            pk=pk,
+            oferta__empresa__user=request.user
+        )
+
+        nuevo_estado = request.POST.get('estado')
+
+        if nuevo_estado in dict(Inscripcion.ESTADO_CHOICES):
+            inscripcion.estado = nuevo_estado
+            inscripcion.save()
+
+            estado_label = dict(Inscripcion.ESTADO_CHOICES)[nuevo_estado]
+
+            emoji_map = {
+                'pendent': '⏳',
+                'revisat': '👀',
+                'acceptat': '✅',
+                'rebutjat': '❌'
+            }
+
+            crear_notificacion(
+                user=inscripcion.alumno.user,
+                mensaje=f"{emoji_map.get(nuevo_estado, '📬')} L'estat de la teva inscripció a '{inscripcion.oferta.titulo}' ha canviat a: {estado_label}",
+                tipo='estado_cambio',
+                url='/alumno/mis-inscripciones/',
+                inscripcion=inscripcion,
+                oferta=inscripcion.oferta
+            )
+
+            messages.success(request, f'Estat canviat a "{estado_label}" correctament.')
+        else:
+            messages.error(request, 'Estat no vàlid.')
+
+        return redirect('empresa_ver_candidatos', pk=inscripcion.oferta.pk)
+
+    return redirect('empresa_ofertas')
+
+
+@login_required
+def empresa_descargar_cv(request, inscripcion_id):
+    """Descargar el CV de un candidato"""
+    if request.user.role != 'empresa':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    inscripcion = get_object_or_404(
+        Inscripcion,
+        pk=inscripcion_id,
+        oferta__empresa__user=request.user
+    )
+
+    alumno = inscripcion.alumno
+
+    if not alumno.cv:
+        messages.error(request, 'Aquest alumne no té CV pujat.')
+        return redirect('empresa_ver_candidatos', pk=inscripcion.oferta.pk)
+
+    from django.http import FileResponse
+    import os
+
+    cv_file = alumno.cv
+    file_extension = os.path.splitext(cv_file.name)[1]
+    download_name = f"CV_{alumno.nom_complet.replace(' ', '_')}{file_extension}"
+
+    response = FileResponse(cv_file.open('rb'))
+    response['Content-Disposition'] = f'attachment; filename="{download_name}"'
+
+    return response
+
+
+# ==================== VISTAS ALUMNO ====================
+
+@login_required
+def alumno_perfil(request):
+    """Perfil del alumno"""
+    if request.user.role != 'alumno':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    try:
+        perfil = request.user.perfil_alumno
+    except PerfilAlumno.DoesNotExist:
+        messages.error(request, '❌ El teu perfil d\'alumne no existeix.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        perfil.nom_complet = request.POST.get('nom_complet')
+        perfil.cicle = request.POST.get('cicle')
+        perfil.any_graduacio = request.POST.get('any_graduacio')
+        perfil.linkedin = request.POST.get('linkedin', '')
+        perfil.github = request.POST.get('github', '')
+        perfil.competencies = request.POST.get('competencies', '')
+        perfil.idiomes = request.POST.get('idiomes', '')
+
+        if 'cv' in request.FILES:
+            perfil.cv = request.FILES['cv']
+
+        perfil.save()
+        messages.success(request, 'Perfil actualitzat correctament.')
+        return redirect('alumno_perfil')
+
+    context = {'perfil': perfil}
+    return render(request, 'core/alumno/perfil.html', context)
+
+
+@login_required
+def alumno_ofertas(request):
+    """Listado de ofertas para alumnos con búsqueda avanzada"""
+    if request.user.role != 'alumno':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    ofertas = Oferta.objects.filter(validada=True, activa=True)
+
+    search = request.GET.get('search', '')
+    modalidad = request.GET.get('modalidad', '')
+    tipo = request.GET.get('tipo', '')
+    ubicacion = request.GET.get('ubicacion', '')
+    fecha_desde = request.GET.get('fecha_desde', '')
+    orden = request.GET.get('orden', '-fecha_publicacion')
+
+    if search:
+        ofertas = ofertas.filter(
+            Q(titulo__icontains=search) |
+            Q(descripcion__icontains=search) |
+            Q(empresa__nombre_empresa__icontains=search) |
+            Q(requisitos__icontains=search)
+        )
+
+    if modalidad:
+        ofertas = ofertas.filter(modalidad=modalidad)
+
+    if tipo:
+        ofertas = ofertas.filter(tipo_contrato=tipo)
+
+    if ubicacion:
+        ofertas = ofertas.filter(ubicacion__icontains=ubicacion)
+
+    if fecha_desde:
+        ofertas = ofertas.filter(fecha_publicacion__gte=fecha_desde)
+
+    ofertas = ofertas.order_by(orden)
+
+    context = {'ofertas': ofertas}
+    return render(request, 'core/alumno/ofertas.html', context)
+
+
+@login_required
+def alumno_detalle_oferta(request, pk):
+    """Detalle de una oferta"""
+    oferta = get_object_or_404(Oferta, pk=pk, validada=True, activa=True)
+
+    inscrito = False
+    if request.user.role == 'alumno':
+        try:
+            inscrito = Inscripcion.objects.filter(
+                alumno=request.user.perfil_alumno,
+                oferta=oferta
+            ).exists()
+        except PerfilAlumno.DoesNotExist:
+            pass
+
+    context = {
+        'oferta': oferta,
+        'inscrito': inscrito
+    }
+    return render(request, 'core/alumno/detalle_oferta.html', context)
+
+
+@login_required
+def alumno_inscribirse(request, pk):
+    """Inscribirse a una oferta"""
+    if request.user.role != 'alumno':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    oferta = get_object_or_404(Oferta, pk=pk, validada=True, activa=True)
+
+    try:
+        perfil = request.user.perfil_alumno
+    except PerfilAlumno.DoesNotExist:
+        messages.error(request, '❌ El teu perfil d\'alumne no existeix.')
+        return redirect('home')
+
+    if Inscripcion.objects.filter(alumno=perfil, oferta=oferta).exists():
+        messages.warning(request, 'Ja estàs inscrit a aquesta oferta.')
+        return redirect('alumno_detalle_oferta', pk=pk)
+
+    if request.method == 'POST':
+        inscripcion = Inscripcion.objects.create(
+            alumno=perfil,
+            oferta=oferta,
+            carta_presentacion=request.POST.get('carta_presentacion', '')
+        )
+
+        crear_notificacion(
+            user=oferta.empresa.user,
+            mensaje=f"🎓 {perfil.nom_complet} s'ha inscrit a la teva oferta '{oferta.titulo}'",
+            tipo='inscripcion',
+            url=f'/empresa/oferta/{oferta.pk}/candidatos/',
+            inscripcion=inscripcion,
+            oferta=oferta
+        )
+
+        messages.success(request, 'Inscripció realitzada correctament!')
+        return redirect('alumno_inscripciones')
+
+    context = {'oferta': oferta}
+    return render(request, 'core/alumno/inscribirse.html', context)
+
+
+@login_required
+def alumno_inscripciones(request):
+    """Mis inscripciones"""
+    if request.user.role != 'alumno':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    try:
+        inscripciones = Inscripcion.objects.filter(alumno=request.user.perfil_alumno)
+    except PerfilAlumno.DoesNotExist:
+        messages.error(request, '❌ El teu perfil d\'alumne no existeix.')
+        return redirect('home')
+
+    context = {'inscripciones': inscripciones}
+    return render(request, 'core/alumno/inscripciones.html', context)
+
+
+@login_required
+def alumno_cancelar_inscripcion(request, pk):
+    """Cancelar una inscripción"""
+    if request.user.role != 'alumno':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    try:
+        inscripcion = get_object_or_404(
+            Inscripcion,
+            pk=pk,
+            alumno=request.user.perfil_alumno
+        )
+    except PerfilAlumno.DoesNotExist:
+        messages.error(request, '❌ El teu perfil d\'alumne no existeix.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        oferta_titulo = inscripcion.oferta.titulo
+        empresa_user = inscripcion.oferta.empresa.user
+
+        crear_notificacion(
+            user=empresa_user,
+            mensaje=f"❌ {request.user.perfil_alumno.nom_complet} ha cancel·lat la seva inscripció a '{oferta_titulo}'",
+            tipo='inscripcion',
+            url=f'/empresa/oferta/{inscripcion.oferta.pk}/candidatos/',
+            oferta=inscripcion.oferta
+        )
+
+        inscripcion.delete()
+
+        messages.success(request, f'Inscripció a "{oferta_titulo}" cancel·lada correctament.')
+        return redirect('alumno_inscripciones')
+
+    context = {'inscripcion': inscripcion}
+    return render(request, 'core/alumno/cancelar_inscripcion.html', context)
+
+
+# ==================== VISTAS ADMIN ====================
+
+@login_required
+def admin_validar_empresas(request):
+    """Vista personalizada para validar empresas"""
+    if not request.user.is_staff:
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        empresa_id = request.POST.get('empresa_id')
+        action = request.POST.get('action')
+
+        try:
+            empresa = PerfilEmpresa.objects.get(id=empresa_id)
+
+            if action == 'validar':
+                empresa.validado = True
+                empresa.save()
+                messages.success(request, f'Empresa {empresa.nombre_empresa} validada correctament.')
+            elif action == 'rechazar':
+                empresa.user.is_active = False
+                empresa.user.save()
+                messages.warning(request, f'Empresa {empresa.nombre_empresa} rebutjada. Usuari desactivat.')
+        except PerfilEmpresa.DoesNotExist:
+            messages.error(request, 'Empresa no trobada.')
+
+        return redirect('admin_validar_empresas')
+
+    empresas_pendientes = PerfilEmpresa.objects.filter(validado=False)
+
+    context = {'empresas': empresas_pendientes}
+    return render(request, 'core/admin/validar_empresas.html', context)
+
+
+@login_required
+def admin_validar_ofertas(request):
+    """Vista personalizada para validar ofertas"""
+    if not request.user.is_staff:
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        oferta_id = request.POST.get('oferta_id')
+        action = request.POST.get('action')
+
+        try:
+            oferta = Oferta.objects.get(id=oferta_id)
+
+            if action == 'validar':
+                oferta.validada = True
+                oferta.save()
+
+                # Notificación de validación exitosa
+                crear_notificacion(
+                    user=oferta.empresa.user,
+                    mensaje=f"✅ La teva oferta '{oferta.titulo}' ha estat validada i ara és visible per als alumnes",
+                    tipo='validacion',
+                    url=f'/empresa/ofertas/',
+                    oferta=oferta
+                )
+
+                messages.success(request, f'Oferta "{oferta.titulo}" validada correctament.')
+
+            elif action == 'rechazar':
+                oferta.activa = False
+                oferta.save()
+
+                # Notificación de rechazo
+                crear_notificacion(
+                    user=oferta.empresa.user,
+                    mensaje=f"❌ La teva oferta '{oferta.titulo}' ha estat rebutjada. Si us plau, revisa el contingut i torna-la a publicar si escau",
+                    tipo='validacion',
+                    url=f'/empresa/oferta/{oferta.id}/editar/',
+                    oferta=oferta
+                )
+
+                messages.warning(request, f'Oferta "{oferta.titulo}" rebutjada i desactivada.')
+
+        except Oferta.DoesNotExist:
+            messages.error(request, 'Oferta no trobada.')
+
+        return redirect('admin_validar_ofertas')
+
+    ofertas_pendientes = Oferta.objects.filter(validada=False)
+
+    context = {'ofertas': ofertas_pendientes}
+    return render(request, 'core/admin/validar_ofertas.html', context)
+
+
+# ==================== VISTAS NOTIFICACIONES ====================
+
+@login_required
+def notificaciones_lista(request):
+    """Lista de notificaciones del usuario"""
+    notificaciones = Notificacion.objects.filter(user=request.user)
+    notificaciones.filter(leida=False).update(leida=True)
+
+    context = {'notificaciones': notificaciones}
+    return render(request, 'core/notificaciones/lista.html', context)
+
+
+@login_required
+def notificacion_marcar_leida(request, pk):
+    """Marcar una notificación como leída"""
+    notificacion = get_object_or_404(Notificacion, pk=pk, user=request.user)
+    notificacion.leida = True
+    notificacion.save()
+
+    if notificacion.url:
+        return redirect(notificacion.url)
+
+    return redirect('notificaciones_lista')
+
+
+@login_required
+def notificaciones_marcar_todas_leidas(request):
+    """Marcar todas las notificaciones como leídas"""
+    Notificacion.objects.filter(user=request.user, leida=False).update(leida=True)
+    messages.success(request, 'Totes les notificacions marcades com llegides.')
+    return redirect('notificaciones_lista')
+
+
+@login_required
+def notificacion_eliminar(request, pk):
+    """Eliminar una notificación"""
+    if request.method == 'POST':
+        notificacion = get_object_or_404(Notificacion, pk=pk, user=request.user)
+        notificacion.delete()
+        messages.success(request, 'Notificació eliminada.')
+
+    return redirect('notificaciones_lista')
+
+
+# ==================== HELPER PARA CREAR NOTIFICACIONES ====================
+
+def crear_notificacion(user, mensaje, tipo, url='', inscripcion=None, oferta=None):
+    """Función helper para crear notificaciones"""
+    Notificacion.objects.create(
+        user=user,
+        mensaje=mensaje,
+        tipo=tipo,
+        url=url,
+        inscripcion=inscripcion,
+        oferta=oferta
+    )
+
+
+def ajustes(request):
+    """Vista de configuración/ajustes del usuario"""
+    context = {
+        'current_language': request.LANGUAGE_CODE,
+    }
+    return render(request, 'core/ajustes.html', context)

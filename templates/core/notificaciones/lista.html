@@ -1,0 +1,166 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}Notificacions{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-4xl">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">
+                {% trans "🔔 Les meves notificacions" %}
+            </h1>
+            <p class="text-sm sm:text-base text-gray-600 mt-2">
+                {% trans "Mantén-te informat de les novetats" %}
+            </p>
+        </div>
+        {% if notificaciones %}
+        <a href="{% url 'notificaciones_marcar_todas_leidas' %}"
+           class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg transition text-sm font-medium text-center whitespace-nowrap flex-shrink-0">
+            ✓ Marcar totes com llegides
+        </a>
+        {% endif %}
+    </div>
+
+    {% if notificaciones %}
+        <div class="space-y-4 sm:space-y-5">
+            {% for notif in notificaciones %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition
+                {% if not notif.leida %}border-l-4 border-blue-500{% endif %}">
+                <div class="p-4 sm:p-5 lg:p-6">
+                    <div class="flex items-start gap-3 sm:gap-4">
+                        <!-- Icono según tipo -->
+                        <div class="flex-shrink-0">
+                            {% if notif.tipo == 'inscripcion' %}
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">{% trans "🎓" %}</span>
+                                </div>
+                            {% elif notif.tipo == 'estado_cambio' %}
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">{% trans "📬" %}</span>
+                                </div>
+                            {% elif notif.tipo == 'oferta_validada' %}
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">{% trans "✅" %}</span>
+                                </div>
+                            {% else %}
+                                <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <span class="text-xl sm:text-2xl">{% trans "📢" %}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-1 min-w-0">
+                            <!-- Header -->
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <h3 class="font-semibold text-base sm:text-lg text-gray-800">
+                                    {{ notif.get_tipo_display }}
+                                </h3>
+                                {% if not notif.leida %}
+                                    <span class="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                        NOU
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <p class="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
+                                📅 {{ notif.fecha|date:"d/m/Y" }} a les {{ notif.fecha|date:"H:i" }}
+                            </p>
+
+                            <!-- Mensaje -->
+                            <p class="text-sm sm:text-base text-gray-700 mb-4 sm:mb-5 break-words">
+                                {{ notif.mensaje }}
+                            </p>
+
+                            <!-- Botones de acción -->
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+                                {% if notif.url %}
+                                <a href="{% url 'notificacion_marcar_leida' notif.pk %}"
+                                   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition text-sm font-medium inline-flex items-center justify-center gap-2">
+                                    <span>{% trans "👁️" %}</span>
+                                    <span>{% trans "Veure detall" %}</span>
+                                </a>
+                                {% endif %}
+
+                                <form method="post" action="{% url 'notificacion_eliminar' notif.pk %}"
+                                      style="display: inline;"
+                                      onsubmit="return confirm('Segur que vols eliminar aquesta notificació?');">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="w-full sm:w-auto bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg transition text-sm font-medium inline-flex items-center justify-center gap-2">
+                                        <span>{% trans "🗑️" %}</span>
+                                        <span>{% trans "Eliminar" %}</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Indicador de no leída -->
+                {% if not notif.leida %}
+                <div class="bg-blue-50 px-4 sm:px-5 py-2 border-t border-blue-100">
+                    <p class="text-xs sm:text-sm text-blue-700 font-medium">
+                        ✨ Nova notificació
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Paginación/Info -->
+        <div class="mt-6 sm:mt-8 bg-white rounded-lg shadow-md p-4 sm:p-5">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <p class="text-sm sm:text-base text-gray-600">
+                    Total: <strong>{{ notificaciones.count }}</strong> notificació{% if notificaciones.count != 1 %}ns{% endif %}
+                </p>
+                <p class="text-xs sm:text-sm text-gray-500">
+                    Les notificacions es marquen com llegides automàticament en veure-les
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <!-- Estado vacío mejorado -->
+        <div class="bg-white rounded-lg shadow-md p-8 sm:p-12 text-center">
+            <div class="max-w-md mx-auto">
+                <!-- Icono grande -->
+                <div class="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-5 sm:mb-6">
+                    <span class="text-5xl sm:text-6xl">{% trans "📭" %}</span>
+                </div>
+
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3">
+                    No tens notificacions
+                </h3>
+                <p class="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
+                    Quan tinguis novetats sobre les teves inscripcions o ofertes, apareixeran aquí.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="{% url 'alumno_ofertas' %}"
+                       class="bg-blue-600 hover:bg-blue-700 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition text-sm sm:text-base">
+                        🔍 Explorar ofertes
+                    </a>
+                    <a href="{% url 'dashboard' %}"
+                       class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition text-sm sm:text-base">
+                        ← Tornar al dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Animación sutil para notificaciones nuevas */
+    @keyframes pulse-border {
+        0%, 100% { border-color: rgb(59, 130, 246); }
+        50% { border-color: rgb(147, 197, 253); }
+    }
+
+    .border-blue-500 {
+        animation: pulse-border 2s ease-in-out infinite;
+    }
+</style>
+{% endblock %}

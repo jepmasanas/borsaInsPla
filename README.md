@@ -42,13 +42,14 @@ Todos los usuarios utilizan la siguiente contraseña: `97v6M2!pe<`
 
 1. **Clonar el repositorio**
 ```bash
-git clone https://github.com/Kaiser-bot/EstanyJobs.git
-cd EstanyJobs
+git clone https://github.com/jepmasanas/borsaInsPla.git
+cd borsaInsPla
 ```
 
 2. **Crear entorno virtual**
 ```bash
-python -m venv venv
+ apt install python3.12-venv
+python3 -m venv venv
 source venv/bin/activate  # En Windows: venv\Scripts\activate
 ```
 

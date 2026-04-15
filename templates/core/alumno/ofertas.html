@@ -1,0 +1,260 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}Ofertes de treball{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 py-6">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+            <div class="flex-1 min-w-0">
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 break-words">{% trans "Ofertes de treball" %}</h1>
+                <p class="text-gray-600 mt-2 text-sm sm:text-base">{% trans "Troba la teva propera oportunitat professional" %}</p>
+            </div>
+            <div class="flex flex-col xs:flex-row gap-2 xs:gap-3 flex-shrink-0">
+                <a href="{% url 'alumno_perfil' %}" class="bg-gray-100 text-gray-700 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-200 transition text-xs sm:text-sm font-medium text-center whitespace-nowrap">
+                    👤 El meu perfil
+                </a>
+                <a href="{% url 'alumno_inscripciones' %}" class="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition text-xs sm:text-sm font-medium text-center whitespace-nowrap">
+                    📋 Les meves inscripcions
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros de búsqueda -->
+    <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-6 mb-6">
+        <form method="get" class="space-y-3 sm:space-y-4">
+            <!-- Fila 1: Búsqueda y filtros principales -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+                <div class="sm:col-span-2 lg:col-span-2">
+                    <label for="search" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                        Cerca per paraula clau
+                    </label>
+                    <input
+                        type="text"
+                        name="search"
+                        id="search"
+                        value="{{ request.GET.search }}"
+                        placeholder="Títol, descripció, empresa..."
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+
+                <div>
+                    <label for="modalidad" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                        Modalitat
+                    </label>
+                    <select
+                        name="modalidad"
+                        id="modalidad"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                        <option value="">{% trans "Totes" %}</option>
+                        <option value="presencial" {% if request.GET.modalidad == 'presencial' %}selected{% endif %}>Presencial</option>
+                        <option value="remot" {% if request.GET.modalidad == 'remot' %}selected{% endif %}>Remot</option>
+                        <option value="hibrid" {% if request.GET.modalidad == 'hibrid' %}selected{% endif %}>Híbrid</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="tipo" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                        Tipus de contracte
+                    </label>
+                    <select
+                        name="tipo"
+                        id="tipo"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                        <option value="">{% trans "Tots" %}</option>
+                        <option value="indefinit" {% if request.GET.tipo == 'indefinit' %}selected{% endif %}>Indefinit</option>
+                        <option value="temporal" {% if request.GET.tipo == 'temporal' %}selected{% endif %}>Temporal</option>
+                        <option value="practiques" {% if request.GET.tipo == 'practiques' %}selected{% endif %}>Pràctiques</option>
+                        <option value="freelance" {% if request.GET.tipo == 'freelance' %}selected{% endif %}>Freelance</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Fila 2: Filtros adicionales -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
+                <div>
+                    <label for="ubicacion" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                        Ubicació
+                    </label>
+                    <input
+                        type="text"
+                        name="ubicacion"
+                        id="ubicacion"
+                        value="{{ request.GET.ubicacion }}"
+                        placeholder="Ciutat, província..."
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+
+                <div>
+                    <label for="fecha_desde" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                        Publicades des de
+                    </label>
+                    <input
+                        type="date"
+                        name="fecha_desde"
+                        id="fecha_desde"
+                        value="{{ request.GET.fecha_desde }}"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                </div>
+
+                <div>
+                    <label for="orden" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                        Ordenar per
+                    </label>
+                    <select
+                        name="orden"
+                        id="orden"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                        <option value="-fecha_publicacion" {% if request.GET.orden == '-fecha_publicacion' or not request.GET.orden %}selected{% endif %}>Més recents</option>
+                        <option value="fecha_publicacion" {% if request.GET.orden == 'fecha_publicacion' %}selected{% endif %}>Més antigues</option>
+                        <option value="titulo" {% if request.GET.orden == 'titulo' %}selected{% endif %}>Títol (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex flex-col xs:flex-row gap-2 xs:gap-3">
+                <button
+                    type="submit"
+                    class="flex-1 xs:flex-none bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-blue-700 transition text-xs sm:text-sm font-medium whitespace-nowrap"
+                >
+                    🔍 Cercar
+                </button>
+                <a
+                    href="{% url 'alumno_ofertas' %}"
+                    class="flex-1 xs:flex-none text-center bg-gray-100 text-gray-700 px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg hover:bg-gray-200 transition text-xs sm:text-sm font-medium whitespace-nowrap"
+                >
+                    Netejar filtres
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de ofertas -->
+    {% if ofertas %}
+    <div class="space-y-3 sm:space-y-4 lg:space-y-6">
+        {% for oferta in ofertas %}
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
+            <div class="p-3 sm:p-4 lg:p-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-6">
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-1 sm:mb-2 break-words">{{ oferta.titulo }}</h3>
+                    <p class="text-base sm:text-lg text-blue-600 font-medium mb-3 truncate">{{ oferta.empresa.nombre_empresa }}</p>
+
+                    <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-3 sm:mb-4">
+                        <span class="bg-blue-100 text-blue-800 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm whitespace-nowrap">
+                            {{ oferta.get_modalidad_display }}
+                        </span>
+                        <span class="bg-purple-100 text-purple-800 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm whitespace-nowrap">
+                            {{ oferta.get_tipo_contrato_display }}
+                        </span>
+                        {% if oferta.ubicacion %}
+                        <span class="bg-gray-100 text-gray-800 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm whitespace-nowrap">
+                            📍 {{ oferta.ubicacion }}
+                        </span>
+                        {% endif %}
+                        {% if oferta.salario %}
+                        <span class="bg-green-100 text-green-800 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm whitespace-nowrap">
+                            💰 {{ oferta.salario }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <p class="text-xs sm:text-sm lg:text-base text-gray-600 mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3">{{ oferta.descripcion|truncatewords:40 }}</p>
+
+                    <div class="text-xs sm:text-sm text-gray-500">
+                        📅 Publicada el {{ oferta.fecha_publicacion|date:"d/m/Y" }}
+                    </div>
+                </div>
+
+                <a
+                    href="{% url 'alumno_detalle_oferta' oferta.pk %}"
+                    class="w-full sm:w-auto bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-xs sm:text-sm text-center whitespace-nowrap flex-shrink-0"
+                >
+                    Veure més →
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-6 text-center text-gray-600 text-sm">
+        <p>S'han trobat {{ ofertas.count }} ofertes</p>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-6 sm:p-8 lg:p-12 text-center">
+        <div class="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">{% trans "🔍" %}</div>
+        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-2 break-words">{% trans "No s'han trobat ofertes" %}</h3>
+        <p class="text-xs sm:text-sm lg:text-base text-gray-600 mb-6">{% trans "Prova a ajustar els filtres de cerca o torna més tard" %}</p>
+        <a href="{% url 'alumno_ofertas' %}" class="text-blue-600 hover:text-blue-700 font-medium text-sm">
+            Veure totes les ofertes
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    h1 {
+        font-size: clamp(1.5rem, 5vw, 2.25rem);
+        line-height: 1.2;
+    }
+
+    h3 {
+        font-size: clamp(1.125rem, 3vw, 1.875rem);
+        line-height: 1.2;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    input, select {
+        transition: all 150ms ease-in-out;
+    }
+
+    input:focus, select:focus {
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 640px) {
+        button, input, select {
+            min-height: 44px;
+            font-size: 16px;
+        }
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+        }
+    }
+</style>
+{% endblock %}

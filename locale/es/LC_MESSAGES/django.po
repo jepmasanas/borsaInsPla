@@ -1,0 +1,1120 @@
+# TRANSLATION FILE FOR EstanyJobs
+# Copyright (C) 2025
+msgid ""
+msgstr ""
+"Project-Id-Version: EstanyJobs 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-14 15:27+0200\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\core\models.py:13
+msgid "Administrador"
+msgstr "Administrador"
+
+#: .\core\models.py:14 .\core\models.py:244 .\templates\core\registro.html:94
+msgid "Empresa"
+msgstr "Empresa"
+
+#: .\core\models.py:15
+#, fuzzy
+#| msgid "Alumne / Exalumne"
+msgid "Alumno/Exalumne"
+msgstr "Estudiante / exalumno"
+
+#: .\core\models.py:22
+msgid "Rol"
+msgstr "Role"
+
+#: .\core\models.py:28
+#, fuzzy
+#| msgid "Telèfon"
+msgid "Telèfon"
+msgstr "Teléfono"
+
+#: .\core\models.py:32
+msgid "Email verificat"
+msgstr "Correo electrónico verificado"
+
+#: .\core\models.py:36 .\core\models.py:49 .\core\models.py:87
+#: .\core\models.py:159 .\core\models.py:367
+#, fuzzy
+#| msgid "Usuari"
+msgid "Usuari"
+msgstr "Usuario"
+
+#: .\core\models.py:37
+#, fuzzy
+#| msgid "Usuari"
+msgid "Usuaris"
+msgstr "Usuarios"
+
+#: .\core\models.py:53
+msgid "Codi"
+msgstr "Código"
+
+#: .\core\models.py:57
+#, fuzzy
+#| msgid "Crear compte"
+msgid "Creat el"
+msgstr "Crear una cuenta"
+
+#: .\core\models.py:60
+msgid "Expira el"
+msgstr "Vence el"
+
+#: .\core\models.py:74
+#, fuzzy
+#| msgid "Verifica el teu email"
+msgid "Verificació Email"
+msgstr "Verifica tu correo electrónico"
+
+#: .\core\models.py:75
+#, fuzzy
+#| msgid "Verifica el teu email"
+msgid "Verificacions Email"
+msgstr "Verifica tu correo electrónico"
+
+#: .\core\models.py:91
+#, fuzzy
+#| msgid "🏢 Sobre l'empresa"
+msgid "Nom de l'empresa"
+msgstr "🏢 Acerca de la empresa"
+
+#: .\core\models.py:96
+msgid "CIF/NIF"
+msgstr "CIF/NIF"
+
+#: .\core\models.py:101
+#, fuzzy
+#| msgid "Direcció"
+msgid "Direcció"
+msgstr "Dirigido"
+
+#: .\core\models.py:107
+#, fuzzy
+#| msgid "Sector"
+msgid "Sector"
+msgstr "Sector"
+
+#: .\core\models.py:112
+msgid "Pàgina web"
+msgstr "Página web"
+
+#: .\core\models.py:119 .\templates\core\admin\validar_empresas.html:31
+msgid "Logo"
+msgstr "Logo"
+
+#: .\core\models.py:124
+#, fuzzy
+#| msgid "Títol, descripció, empresa..."
+msgid "Descripció de l'empresa"
+msgstr "Título, descripción, empresa..."
+
+#: .\core\models.py:128 .\core\models.py:360
+#, fuzzy
+#| msgid "Empresa"
+msgid "Empresa validada"
+msgstr "Empresa"
+
+#: .\core\models.py:132 .\core\models.py:214
+msgid "Data de registre"
+msgstr "Fecha de registro"
+
+#: .\core\models.py:136
+#, fuzzy
+#| msgid "Per Empreses"
+msgid "Perfil Empresa"
+msgstr "Por empresas"
+
+#: .\core\models.py:137
+#, fuzzy
+#| msgid "Per Empreses"
+msgid "Perfils Empreses"
+msgstr "Por empresas"
+
+#: .\core\models.py:146
+#, fuzzy
+#| msgid "CFGS DAM - Desenvolupament d'Aplicacions Multiplataforma"
+msgid "CFGS Desenvolupament d'Aplicacions Multiplataforma (DAM)"
+msgstr "CFGS DAM - Desarrollo de Aplicaciones Multiplataforma"
+
+#: .\core\models.py:147
+#, fuzzy
+#| msgid "CFGM SMX - Sistemes microinformàtics i xarxes"
+msgid "CFGM Sistemes microinformàtics i xarxes (SMX)"
+msgstr "CFGM SMX - Sistemas y redes microinformáticas"
+
+#: .\core\models.py:148
+#, fuzzy
+#| msgid "CFGM APD - Atenció a la dependència (Dual)"
+msgid "CFGM Atenció a la dependència (APD) en Dual"
+msgstr "CFGM APD - Atención a la Dependencia (Dual)"
+
+#: .\core\models.py:149
+#, fuzzy
+#| msgid "CFGM CAI - Cures Auxiliars d'Infermeria"
+msgid "CFGM Cures Auxiliars d'Infermeria"
+msgstr "CFGM CAI - Cuidados Auxiliares de Enfermería"
+
+#: .\core\models.py:150
+msgid "ESO"
+msgstr "OE"
+
+#: .\core\models.py:151 .\templates\core\alumno\perfil.html:55
+#: .\templates\core\registro.html:127
+msgid "Batxillerat"
+msgstr "Escuela secundaria"
+
+#: .\core\models.py:152 .\templates\core\alumno\perfil.html:56
+#: .\templates\core\registro.html:128
+msgid "Altres"
+msgstr "Otro"
+
+#: .\core\models.py:163
+msgid "Nom complet"
+msgstr "Nombre completo"
+
+#: .\core\models.py:168
+msgid "Cicle formatiu"
+msgstr "Ciclo de entrenamiento"
+
+#: .\core\models.py:171
+msgid "Any de graduació"
+msgstr "año de graduación"
+
+#: .\core\models.py:178 .\templates\core\alumno\perfil.html:80
+msgid "Curriculum Vitae"
+msgstr "Currículum vitae"
+
+#: .\core\models.py:185
+#, fuzzy
+#| msgid "El meu perfil"
+msgid "Foto de perfil"
+msgstr "mi perfil"
+
+#: .\core\models.py:190
+#, fuzzy
+#| msgid "LinkedIn"
+msgid "Perfil LinkedIn"
+msgstr "Linkedin"
+
+#: .\core\models.py:195
+#, fuzzy
+#| msgid "GitHub"
+msgid "Perfil GitHub"
+msgstr "Github"
+
+#: .\core\models.py:200 .\templates\core\alumno\perfil.html:145
+msgid "Competències i habilitats"
+msgstr "Habilidades y habilidades"
+
+#: .\core\models.py:206
+msgid "Idiomes"
+msgstr "Idiomas"
+
+#: .\core\models.py:210
+msgid "Disponible per treballar"
+msgstr "Disponible para trabajar"
+
+#: .\core\models.py:218
+#, fuzzy
+#| msgid "Per Alumnes"
+msgid "Perfil Alumne"
+msgstr "Por estudiantes"
+
+#: .\core\models.py:219
+#, fuzzy
+#| msgid "Per Alumnes"
+msgid "Perfils Alumnes"
+msgstr "Por estudiantes"
+
+#: .\core\models.py:228 .\templates\core\alumno\ofertas.html:51
+#: .\templates\core\empresa\editar_oferta.html:71
+#: .\templates\core\empresa\nueva_oferta.html:73
+msgid "Presencial"
+msgstr "Presencial"
+
+#: .\core\models.py:229 .\templates\core\alumno\ofertas.html:52
+#: .\templates\core\empresa\editar_oferta.html:72
+#: .\templates\core\empresa\nueva_oferta.html:74
+msgid "Remot"
+msgstr "Remoto"
+
+#: .\core\models.py:230 .\templates\core\alumno\ofertas.html:53
+#: .\templates\core\empresa\editar_oferta.html:73
+#: .\templates\core\empresa\nueva_oferta.html:75
+msgid "Híbrid"
+msgstr "Híbrido"
+
+#: .\core\models.py:234 .\templates\core\alumno\ofertas.html:67
+#: .\templates\core\empresa\editar_oferta.html:87
+#: .\templates\core\empresa\nueva_oferta.html:89
+msgid "Indefinit"
+msgstr "Indefinido"
+
+#: .\core\models.py:235 .\templates\core\alumno\ofertas.html:68
+#: .\templates\core\empresa\editar_oferta.html:88
+#: .\templates\core\empresa\nueva_oferta.html:90
+msgid "Temporal"
+msgstr "Temporal"
+
+#: .\core\models.py:236 .\templates\core\alumno\ofertas.html:69
+#: .\templates\core\empresa\editar_oferta.html:89
+#: .\templates\core\empresa\nueva_oferta.html:91
+msgid "Pràctiques"
+msgstr "Prácticas"
+
+#: .\core\models.py:237 .\templates\core\alumno\ofertas.html:70
+#: .\templates\core\empresa\editar_oferta.html:90
+#: .\templates\core\empresa\nueva_oferta.html:92
+msgid "Freelance"
+msgstr "Freelance"
+
+#: .\core\models.py:248
+msgid "Títol de l'oferta"
+msgstr "Título de la oferta"
+
+#: .\core\models.py:251
+#, fuzzy
+#| msgid "Descripció"
+msgid "Descripció"
+msgstr "Descripción"
+
+#: .\core\models.py:254
+#, fuzzy
+#| msgid "Requisits"
+msgid "Requisits"
+msgstr "Requisitos"
+
+#: .\core\models.py:260
+#, fuzzy
+#| msgid "Ofertes per Modalitat"
+msgid "Modalitat"
+msgstr "Ofertas por modalidad"
+
+#: .\core\models.py:266
+#, fuzzy
+#| msgid "Ofertes per Tipus de Contracte"
+msgid "Tipus de contracte"
+msgstr "Ofertas por tipo de contrato"
+
+#: .\core\models.py:272
+msgid "Ubicació"
+msgstr "Ubicación"
+
+#: .\core\models.py:278
+msgid "Salari"
+msgstr "Salario"
+
+#: .\core\models.py:282
+#, fuzzy
+#| msgid "Carta de presentació"
+msgid "Data de publicació"
+msgstr "Carta de presentación"
+
+#: .\core\models.py:287
+msgid "Data de tancament"
+msgstr "fecha de cierre"
+
+#: .\core\models.py:291
+msgid "Activa"
+msgstr "Activo"
+
+#: .\core\models.py:295
+#, fuzzy
+#| msgid "Totes les ofertes són validades per l'administració"
+msgid "Oferta validada per l'administrador"
+msgstr "Todas las ofertas son validadas por la administración."
+
+#: .\core\models.py:299 .\core\models.py:326 .\core\models.py:404
+#, fuzzy
+#| msgid "Oferta"
+msgid "Oferta"
+msgstr "Oferta"
+
+#: .\core\models.py:300
+#, fuzzy
+#| msgid "Oferta"
+msgid "Ofertes"
+msgstr "Oferta"
+
+#: .\core\models.py:310
+msgid "Pendent"
+msgstr "Pendiente"
+
+#: .\core\models.py:311
+msgid "Revisat"
+msgstr "Revisado"
+
+#: .\core\models.py:312
+msgid "Acceptat"
+msgstr "Aceptado"
+
+#: .\core\models.py:313
+msgid "Rebutjat"
+msgstr "Rechazado"
+
+#: .\core\models.py:320
+#, fuzzy
+#| msgid "Alumnes"
+msgid "Alumne"
+msgstr "Estudiantes"
+
+#: .\core\models.py:330
+#, fuzzy
+#| msgid "Data d'inscripció"
+msgid "Data d'inscripció"
+msgstr "Fecha de registro"
+
+#: .\core\models.py:336
+#, fuzzy
+#| msgid "Estany"
+msgid "Estat"
+msgstr "Estanque"
+
+#: .\core\models.py:341
+#, fuzzy
+#| msgid "Carta de presentació"
+msgid "Carta de presentació"
+msgstr "Carta de presentación"
+
+#: .\core\models.py:345 .\core\models.py:397
+#, fuzzy
+#| msgid "Descripció"
+msgid "Inscripció"
+msgstr "Descripción"
+
+#: .\core\models.py:346
+#, fuzzy
+#| msgid "Total Inscripcions"
+msgid "Inscripcions"
+msgstr "Registro total"
+
+#: .\core\models.py:357
+#, fuzzy
+#| msgid "Data d'inscripció"
+msgid "Nova inscripció"
+msgstr "Fecha de registro"
+
+#: .\core\models.py:358
+msgid "Canvi d'estat"
+msgstr "Cambiar"
+
+#: .\core\models.py:359
+msgid "Oferta validada"
+msgstr "Oferta validada"
+
+#: .\core\models.py:370
+msgid "Missatge"
+msgstr "Mensaje"
+
+#: .\core\models.py:374 .\core\models.py:413
+msgid "Llegida"
+msgstr "Leer"
+
+#: .\core\models.py:378
+msgid "Data"
+msgstr "Fecha"
+
+#: .\core\models.py:383
+msgid "Tipus"
+msgstr "Tipo"
+
+#: .\core\models.py:388
+msgid "Enllaç"
+msgstr "Enlace"
+
+#: .\core\models.py:408
+msgid "Notificació"
+msgstr "Notificación"
+
+#: .\core\models.py:409
+msgid "Notificacions"
+msgstr "Notificaciones"
+
+#: .\core\models.py:413
+msgid "No llegida"
+msgstr "No leído"
+
+#: .\templates\core\admin\validar_empresas.html:10
+msgid "Validar empreses"
+msgstr "Validar empresas"
+
+#: .\templates\core\admin\validar_empresas.html:11
+msgid "Gestió d'empreses pendents de validació"
+msgstr "Gestión de Empresas Pendientes de Validación"
+
+#: .\templates\core\admin\validar_empresas.html:45
+msgid "Usuari"
+msgstr "Usuario"
+
+#: .\templates\core\admin\validar_empresas.html:51
+#: .\templates\core\admin\validar_ofertas.html:76
+#: .\templates\core\alumno\detalle_oferta.html:63
+#: .\templates\core\alumno\editar_oferta.html:63
+msgid "Sector"
+msgstr "Sector"
+
+#: .\templates\core\admin\validar_empresas.html:58
+msgid "Direcció"
+msgstr "Dirigido por"
+
+#: .\templates\core\admin\validar_empresas.html:65
+msgid "Web"
+msgstr "Web"
+
+#: .\templates\core\admin\validar_empresas.html:75
+#: .\templates\core\admin\validar_ofertas.html:61
+msgid "Descripció"
+msgstr "Descripción"
+
+#: .\templates\core\admin\validar_empresas.html:128
+#: .\templates\core\admin\validar_ofertas.html:132
+msgid "✓"
+msgstr "✓"
+
+#: .\templates\core\admin\validar_empresas.html:129
+msgid "No hi ha empreses pendents"
+msgstr "No hay empresas pendientes"
+
+#: .\templates\core\admin\validar_empresas.html:130
+msgid "Totes les empreses han estat validades"
+msgstr "Todas las empresas han sido validadas."
+
+#: .\templates\core\admin\validar_ofertas.html:10
+msgid "Validar ofertes"
+msgstr "Validar ofertas"
+
+#: .\templates\core\admin\validar_ofertas.html:11
+msgid "Gestió d'ofertes pendents de validació"
+msgstr "Gestión de ofertas pendientes de validación."
+
+#: .\templates\core\admin\validar_ofertas.html:66
+msgid "Requisits"
+msgstr "Requisitos"
+
+#: .\templates\core\admin\validar_ofertas.html:73
+#: .\templates\core\alumno\cancelar_inscripcion.html:40
+msgid "Empresa"
+msgstr "Compañía"
+
+#: .\templates\core\admin\validar_ofertas.html:74
+msgid "CIF"
+msgstr "CIF"
+
+#: .\templates\core\admin\validar_ofertas.html:80
+msgid "Contacte"
+msgstr ": Contacto"
+
+#: .\templates\core\admin\validar_ofertas.html:81
+msgid "Publicada"
+msgstr "Publicado"
+
+#: .\templates\core\admin\validar_ofertas.html:83
+msgid "Tancament"
+msgstr "Cierre"
+
+#: .\templates\core\admin\validar_ofertas.html:133
+msgid "No hi ha ofertes pendents"
+msgstr "No hay ofertas pendientes"
+
+#: .\templates\core\admin\validar_ofertas.html:134
+msgid "Totes les ofertes han estat validades"
+msgstr "Todas las ofertas han sido validadas."
+
+#: .\templates\core\ajustes.html:36 .\templates\core\ajustes.html:56
+msgid "🇪🇸"
+msgstr "🇪🇸"
+
+#: .\templates\core\ajustes.html:37
+msgid "Català"
+msgstr "catalán"
+
+#: .\templates\core\ajustes.html:57
+msgid "Español"
+msgstr "Español"
+
+#: .\templates\core\ajustes.html:76
+msgid "🇬🇧"
+msgstr "🇬🇧"
+
+#: .\templates\core\ajustes.html:77
+msgid "English"
+msgstr "Inglés"
+
+#: .\templates\core\ajustes.html:93
+#: .\templates\core\alumno\cancelar_inscripcion.html:74
+#: .\templates\core\empresa\nueva_oferta.html:127
+msgid "Nota"
+msgstr "Nota"
+
+#: .\templates\core\alumno\cancelar_inscripcion.html:11
+msgid "⚠️ Confirmar cancel·lació"
+msgstr "⚠️ Confirmar cancelación"
+
+#: .\templates\core\alumno\cancelar_inscripcion.html:30
+msgid "Detalls de la inscripció"
+msgstr "Detalles de registro"
+
+#: .\templates\core\alumno\cancelar_inscripcion.html:35
+msgid "Oferta"
+msgstr "Oferta"
+
+#: .\templates\core\alumno\cancelar_inscripcion.html:45
+msgid "Data d'inscripció"
+msgstr "Fecha de registro"
+
+#: .\templates\core\alumno\cancelar_inscripcion.html:50
+msgid "Estat actual"
+msgstr "Estado actual"
+
+#: .\templates\core\alumno\cancelar_inscripcion.html:76
+msgid "⚠️ Has estat acceptat!"
+msgstr "⚠️ ¡Has sido aceptado!"
+
+#: .\templates\core\alumno\detalle_oferta.html:44
+#: .\templates\core\alumno\editar_oferta.html:44
+msgid "📝 Descripció"
+msgstr "📝 Descripción"
+
+#: .\templates\core\alumno\detalle_oferta.html:52
+#: .\templates\core\alumno\editar_oferta.html:52
+msgid "✅ Requisits"
+msgstr "✅ Requisitos"
+
+#: .\templates\core\alumno\detalle_oferta.html:60
+#: .\templates\core\alumno\editar_oferta.html:60
+msgid "🏢 Sobre l'empresa"
+msgstr "🏢 Acerca de la empresa"
+
+#: .\templates\core\alumno\detalle_oferta.html:85
+#: .\templates\core\alumno\editar_oferta.html:85
+msgid "✓ Ja estàs inscrit a aquesta oferta"
+msgstr "✓ Ya estás registrado para esta oferta"
+
+#: .\templates\core\alumno\detalle_oferta.html:87
+#: .\templates\core\alumno\editar_oferta.html:87
+msgid "les meves inscripcions"
+msgstr "mis inscripciones"
+
+#: .\templates\core\alumno\detalle_oferta.html:92
+#: .\templates\core\alumno\editar_oferta.html:92
+msgid "T'interessa aquesta oferta?"
+msgstr "¿Estás interesado en esta oferta?"
+
+#: .\templates\core\alumno\detalle_oferta.html:93
+#: .\templates\core\alumno\editar_oferta.html:93
+msgid "Inscriu-te i envia la teva candidatura a l'empresa"
+msgstr "Regístrate y envía tu candidatura a la empresa"
+
+#: .\templates\core\alumno\inscribirse.html:15
+msgid "Inscriure's a l'oferta"
+msgstr "Regístrate para la oferta"
+
+#: .\templates\core\alumno\inscribirse.html:23
+msgid "Abans d'inscriure't"
+msgstr "Antes de registrarte"
+
+#: .\templates\core\alumno\inscribirse.html:24
+msgid "Editar el meu perfil"
+msgstr "Editar mi perfil"
+
+#: .\templates\core\alumno\inscribirse.html:36
+msgid ""
+"Explica per què t'interessa aquesta oferta i què pots aportar a l'empresa..."
+msgstr ""
+"Explica por qué te interesa esta oferta y qué puedes aportar a la empresa..."
+
+#: .\templates\core\alumno\inscribirse.html:45
+msgid "Què inclou la teva candidatura"
+msgstr "¿Qué incluye su candidatura?"
+
+#: .\templates\core\alumno\inscribirse.html:47
+msgid "✓ El teu perfil complet (nom, cicle, any graduació)"
+msgstr "✓ Tu perfil completo (nombre, ciclo, año de graduación)"
+
+#: .\templates\core\alumno\inscribirse.html:48
+msgid "✓ El teu CV (si l'has pujat)"
+msgstr "✓ Tu CV (si lo tienes)"
+
+#: .\templates\core\alumno\inscribirse.html:49
+msgid "✓ Enllaços a LinkedIn i GitHub (si els tens)"
+msgstr "✓ Enlaces a Linkedin y Github (si los tienes)"
+
+#: .\templates\core\alumno\inscribirse.html:50
+msgid "✓ La carta de presentació (si l'escrius)"
+msgstr "✓ La carta de presentación (si la escribes)"
+
+#: .\templates\core\alumno\inscripciones.html:10
+msgid "Les meves inscripcions"
+msgstr "Mis inscripciones"
+
+#: .\templates\core\alumno\inscripciones.html:11
+msgid "Seguiment de les teves candidatures"
+msgstr "Seguimiento de sus nominaciones"
+
+#: .\templates\core\alumno\inscripciones.html:57
+#: .\templates\core\empresa\ver_candidatos.html:108
+msgid "Carta de presentació"
+msgstr "Carta de presentación"
+
+#: .\templates\core\alumno\inscripciones.html:88
+#: .\templates\core\empresa\ofertas.html:134
+#: .\templates\core\estadisticas.html:50
+msgid "📋"
+msgstr "📋"
+
+#: .\templates\core\alumno\inscripciones.html:89
+msgid "Encara no tens inscripcions"
+msgstr "Aún no tienes registros"
+
+#: .\templates\core\alumno\inscripciones.html:90
+msgid "Explora les ofertes disponibles i inscriu-te a les que t'interessin"
+msgstr ""
+"Explora las ofertas disponibles y regístrate en aquellas que te interesen"
+
+#: .\templates\core\alumno\ofertas.html:10
+msgid "Ofertes de treball"
+msgstr "Ofertas de empleo"
+
+#: .\templates\core\alumno\ofertas.html:11
+msgid "Troba la teva propera oportunitat professional"
+msgstr "Encuentra tu próxima oportunidad profesional"
+
+#: .\templates\core\alumno\ofertas.html:36
+msgid "Títol, descripció, empresa..."
+msgstr "Título, descripción, empresa..."
+
+#: .\templates\core\alumno\ofertas.html:50
+msgid "Totes"
+msgstr "Todo"
+
+#: .\templates\core\alumno\ofertas.html:66
+msgid "Tots"
+msgstr "Todo"
+
+#: .\templates\core\alumno\ofertas.html:86
+msgid "Ciutat, província..."
+msgstr "Ciudad, provincia..."
+
+#: .\templates\core\alumno\ofertas.html:113
+msgid "Més recents"
+msgstr "Más reciente"
+
+#: .\templates\core\alumno\ofertas.html:114
+msgid "Més antigues"
+msgstr "Más viejo"
+
+#: .\templates\core\alumno\ofertas.html:115
+msgid "Títol (A-Z)"
+msgstr "Título (A-Z)"
+
+#: .\templates\core\alumno\ofertas.html:191
+msgid "🔍"
+msgstr "🔍"
+
+#: .\templates\core\alumno\ofertas.html:192
+msgid "No s'han trobat ofertes"
+msgstr "No se han encontrado ofertas"
+
+#: .\templates\core\alumno\ofertas.html:193
+msgid "Prova a ajustar els filtres de cerca o torna més tard"
+msgstr "Pruebe para ajustar los filtros de búsqueda o volver más tarde"
+
+#: .\templates\core\alumno\perfil.html:15
+msgid "El meu perfil"
+msgstr "mi perfil"
+
+#: .\templates\core\alumno\perfil.html:22
+msgid "Informació bàsica"
+msgstr "Información básica"
+
+#: .\templates\core\alumno\perfil.html:49
+msgid "CFGS DAM - Desenvolupament d'Aplicacions Multiplataforma"
+msgstr "CFGS DAM - Desarrollo de Aplicaciones Multiplataforma"
+
+#: .\templates\core\alumno\perfil.html:50 .\templates\core\registro.html:123
+msgid "CFGM SMX - Sistemes microinformàtics i xarxes"
+msgstr "CFGM SMX - Sistemas y redes microinformáticas"
+
+#: .\templates\core\alumno\perfil.html:51 .\templates\core\registro.html:124
+msgid "CFGM APD - Atenció a la dependència (Dual)"
+msgstr "CFGM APD - Atención a la Dependencia (Dual)"
+
+#: .\templates\core\alumno\perfil.html:52
+msgid "CFGM CAI - Cures Auxiliars d'Infermeria"
+msgstr "CFGM CAI - Cuidados Auxiliares de Enfermería"
+
+#: .\templates\core\alumno\perfil.html:53
+msgid "FP Dual"
+msgstr "FP Dual"
+
+#: .\templates\core\alumno\perfil.html:84
+msgid "✓ Tens un CV pujat"
+msgstr "✓ Tienes un CV elevado"
+
+#: .\templates\core\alumno\perfil.html:110
+msgid "Enllaços professionals"
+msgstr "Enlaces profesionales"
+
+#: .\templates\core\alumno\perfil.html:122
+msgid "https://linkedin.com/in/..."
+msgstr ""
+
+#: .\templates\core\alumno\perfil.html:136
+msgid "https://github.com/..."
+msgstr ""
+
+#: .\templates\core\alumno\perfil.html:155
+msgid "Ex: Java, Python, React, SQL, Treball en equip, Git..."
+msgstr "Ej: Java, Python, React, SQL, trabajo en equipo, git..."
+
+#: .\templates\core\alumno\perfil.html:169
+msgid "Ex: Català (natiu), Castellà (natiu), Anglès (B2)"
+msgstr "Ej: catalán (nativo), español (nativo), inglés (B2)"
+
+#: .\templates\core\base.html:25
+msgid "Estany"
+msgstr "Estany"
+
+#: .\templates\core\base.html:26
+msgid "Jobs"
+msgstr "Jobs"
+
+#: .\templates\core\base.html:35
+msgid "(Admin)"
+msgstr "(Administración)"
+
+#: .\templates\core\base.html:37
+msgid "(Empresa)"
+msgstr "(Compañía)"
+
+#: .\templates\core\base.html:39
+msgid "(Alumne)"
+msgstr "(Alumno)"
+
+#: .\templates\core\base.html:117
+msgid "&copy; 2025 EstanyJobs - Institut Pla de l'Estany"
+msgstr "& Copiar;2025 Estanyjobs - Institut Pla de l'Estany"
+
+#: .\templates\core\base.html:118
+msgid "Projecte Final DAM 2025-26"
+msgstr "Proyecto Final Presa 2025-26"
+
+#: .\templates\core\empresa\editar_oferta.html:15
+msgid "Editar oferta"
+msgstr "Editar oferta"
+
+#: .\templates\core\empresa\nueva_oferta.html:15
+msgid "Publicar nova oferta"
+msgstr "Publicar nueva oferta"
+
+#: .\templates\core\empresa\nueva_oferta.html:29
+msgid "Ex: Desenvolupador/a Full Stack"
+msgstr "Ej: Desarrollador Full Stack"
+
+#: .\templates\core\empresa\nueva_oferta.html:43
+msgid "Descriu les funcions principals del lloc de treball..."
+msgstr "Describe las principales funciones del lugar de trabajo..."
+
+#: .\templates\core\empresa\nueva_oferta.html:57
+msgid "Llista els requisits necessaris o desitjables..."
+msgstr "Enumere los requisitos necesarios o deseables..."
+
+#: .\templates\core\empresa\nueva_oferta.html:106
+msgid "Ex: Barcelona, Catalunya"
+msgstr "Ej: Barcelona, ​​Cataluña"
+
+#: .\templates\core\empresa\nueva_oferta.html:119
+msgid "Ex: 25.000-30.000€/any"
+msgstr "Ej: 25.000-30.000€/año"
+
+#: .\templates\core\empresa\ofertas.html:10
+msgid "Les meves ofertes"
+msgstr "Mis ofertas"
+
+#: .\templates\core\empresa\ofertas.html:21
+msgid "⚠️ Empresa pendent de validació"
+msgstr "⚠️ Empresa pendiente de validación"
+
+#: .\templates\core\empresa\ofertas.html:22
+msgid ""
+"El vostre perfil està pendent de validació per l'administració. Les ofertes "
+"no seran visibles fins que sigui validat."
+msgstr ""
+"Tu perfil está pendiente de validación por parte de la administración.Las "
+"ofertas no serán visibles hasta que sea validada."
+
+#: .\templates\core\empresa\ofertas.html:102
+msgid "Últims candidats"
+msgstr "Últimos candidatos"
+
+#: .\templates\core\empresa\ofertas.html:135
+msgid "No tens ofertes publicades"
+msgstr "No tienes ofertas publicadas"
+
+#: .\templates\core\empresa\ofertas.html:136
+msgid "Comença publicant la teva primera oferta de treball"
+msgstr "Empiece por publicar su primera oferta de trabajo"
+
+#: .\templates\core\empresa\ver_candidatos.html:13
+msgid "Candidats inscrits"
+msgstr "Candidatos inscritos"
+
+#: .\templates\core\empresa\ver_candidatos.html:24
+msgid "Filtrar per estat"
+msgstr "Filtrar por estado"
+
+#: .\templates\core\empresa\ver_candidatos.html:26
+msgid "Tots els estats"
+msgstr "Todos los estados"
+
+#: .\templates\core\empresa\ver_candidatos.html:69
+msgid "Email"
+msgstr "Correo electrónico"
+
+#: .\templates\core\empresa\ver_candidatos.html:73
+msgid "Telèfon"
+msgstr "Teléfono"
+
+#: .\templates\core\empresa\ver_candidatos.html:80
+msgid "LinkedIn"
+msgstr "Linkedin"
+
+#: .\templates\core\empresa\ver_candidatos.html:88
+msgid "GitHub"
+msgstr "Github"
+
+#: .\templates\core\empresa\ver_candidatos.html:100
+msgid "Competències"
+msgstr "Competencias"
+
+#: .\templates\core\empresa\ver_candidatos.html:170
+#: .\templates\core\estadisticas.html:20
+msgid "👥"
+msgstr "👥"
+
+#: .\templates\core\estadisticas.html:8
+msgid "📊 Estadístiques del Sistema"
+msgstr "📊 Estadísticas del sistema"
+
+#: .\templates\core\estadisticas.html:9
+msgid "Resum general de la Borsa de Treball"
+msgstr "Resumen General de la Bolsa de Trabajo"
+
+#: .\templates\core\estadisticas.html:17
+msgid "Total Usuaris"
+msgstr "Usuarios totales"
+
+#: .\templates\core\estadisticas.html:27
+msgid "Alumnes"
+msgstr "Estudiantes"
+
+#: .\templates\core\estadisticas.html:30 .\templates\core\home.html:35
+#: .\templates\core\notificaciones\lista.html:36
+msgid "🎓"
+msgstr "🎓"
+
+#: .\templates\core\estadisticas.html:37
+msgid "Empreses"
+msgstr "Empresas"
+
+#: .\templates\core\estadisticas.html:40 .\templates\core\home.html:40
+msgid "🏢"
+msgstr "🏢"
+
+#: .\templates\core\estadisticas.html:47
+msgid "Ofertes Actives"
+msgstr "Ofertas activas"
+
+#: .\templates\core\estadisticas.html:58
+msgid "Total Ofertes"
+msgstr "Ofertas totales"
+
+#: .\templates\core\estadisticas.html:60
+msgid "Totes les ofertes del sistema"
+msgstr "Todas las ofertas del sistema"
+
+#: .\templates\core\estadisticas.html:64
+msgid "Total Inscripcions"
+msgstr "Registro total"
+
+#: .\templates\core\estadisticas.html:66
+msgid "Candidatures trameses"
+msgstr "Nominaciones enviadas"
+
+#: .\templates\core\estadisticas.html:70
+msgid "Taxa d'Activitat"
+msgstr "Tasa de actividad"
+
+#: .\templates\core\estadisticas.html:72
+msgid "Ofertes actives / totals"
+msgstr "Ofertas activas / totales"
+
+#: .\templates\core\estadisticas.html:80
+msgid "Ofertes per Modalitat"
+msgstr "Ofertas por modalidad"
+
+#: .\templates\core\estadisticas.html:86
+msgid "Ofertes per Tipus de Contracte"
+msgstr "Ofertas por tipo de contrato"
+
+#: .\templates\core\estadisticas.html:95
+msgid "Alumnes per Cicle"
+msgstr "Estudiantes por ciclo"
+
+#: .\templates\core\estadisticas.html:102
+msgid "Estat de les Inscripcions"
+msgstr "Estado de las inscripciones"
+
+#: .\templates\core\home.html:10
+msgid "Borsa de Treball"
+msgstr "Bolsa de trabajo"
+
+#: .\templates\core\home.html:11
+msgid "Institut Pla de l'Estany"
+msgstr "Instituto Pla de l'Estany"
+
+#: .\templates\core\home.html:36
+msgid "Per Alumnes"
+msgstr "Por estudiantes"
+
+#: .\templates\core\home.html:37
+msgid "Troba oportunitats laborals adaptades al teu perfil professional"
+msgstr "Encuentra oportunidades de empleo adaptadas a tu perfil profesional"
+
+#: .\templates\core\home.html:41
+msgid "Per Empreses"
+msgstr "Por empresas"
+
+#: .\templates\core\home.html:42
+msgid "Publica ofertes i troba talent format a l'institut"
+msgstr "Publica ofertas y encuentra talento formado en el bachillerato"
+
+#: .\templates\core\home.html:45 .\templates\core\notificaciones\lista.html:44
+msgid "✅"
+msgstr "✅"
+
+#: .\templates\core\home.html:46
+msgid "Validat"
+msgstr "Validado"
+
+#: .\templates\core\home.html:47
+msgid "Totes les ofertes són validades per l'administració"
+msgstr "Todas las ofertas son validadas por la administración."
+
+#: .\templates\core\home.html:54
+msgid "Ofertes Recents"
+msgstr "Ofertas recientes"
+
+#: .\templates\core\home.html:82
+msgid "Comença ara!"
+msgstr "¡Empiece ahora!"
+
+#: .\templates\core\home.html:83
+msgid "Registra't i troba la teva propera oportunitat professional"
+msgstr "Regístrate y encuentra tu próxima oportunidad profesional"
+
+#: .\templates\core\login.html:9
+msgid "Iniciar sessió"
+msgstr "Iniciar sesión"
+
+#: .\templates\core\login.html:24
+#, fuzzy
+#| msgid "Introdueix el teu nom d"
+msgid "Introdueix el teu nom d'usuari"
+msgstr "Introduce tu nombre d."
+
+#: .\templates\core\login.html:38
+msgid "Introdueix la teva contrasenya"
+msgstr "Introduce tu contraseña"
+
+#: .\templates\core\notificaciones\lista.html:11
+msgid "🔔 Les meves notificacions"
+msgstr "🔔 Mis notificaciones"
+
+#: .\templates\core\notificaciones\lista.html:12
+msgid "Mantén-te informat de les novetats"
+msgstr "Mantenerte informado de las novedades."
+
+#: .\templates\core\notificaciones\lista.html:40
+msgid "📬"
+msgstr "📬"
+
+#: .\templates\core\notificaciones\lista.html:48
+msgid "📢"
+msgstr "📢"
+
+#: .\templates\core\notificaciones\lista.html:80
+msgid "👁️"
+msgstr "👁️"
+
+#: .\templates\core\notificaciones\lista.html:81
+msgid "Veure detall"
+msgstr "Ver detalle"
+
+#: .\templates\core\notificaciones\lista.html:91
+msgid "🗑️"
+msgstr "🗑️"
+
+#: .\templates\core\notificaciones\lista.html:92
+msgid "Eliminar"
+msgstr "Eliminar"
+
+#: .\templates\core\notificaciones\lista.html:129
+msgid "📭"
+msgstr "📭"
+
+#: .\templates\core\registro.html:9
+msgid "Crear compte"
+msgstr "Crear una cuenta"
+
+#: .\templates\core\registro.html:58
+msgid "• Mínim 8 caràcters"
+msgstr "• Mínimo 8 caracteres"
+
+#: .\templates\core\registro.html:59
+msgid "• Almenys un número"
+msgstr "• Al menos un número"
+
+#: .\templates\core\registro.html:60
+msgid "• Lletres majúscules i minúscules"
+msgstr "• letras mayúsculas y minúsculas"
+
+#: .\templates\core\registro.html:92
+msgid "Selecciona..."
+msgstr "Seleccionar ..."
+
+#: .\templates\core\registro.html:93
+msgid "Alumne / Exalumne"
+msgstr "Estudiante / exalumno"
+
+#: .\templates\core\registro.html:122
+msgid "CFGS DAM - Desenvolupament d&#39;Aplicacions Multiplataforma"
+msgstr "CFGS DAM - Desarrollo de Aplicaciones Multiplataforma"
+
+#: .\templates\core\registro.html:125
+msgid "CFGM CAI - Cures Auxiliars d&#39;Infermeria"
+msgstr "CFGM CAI - Cuidados Auxiliares de Enfermería"
+
+#: .\templates\core\verificar_email.html:10
+msgid "📧"
+msgstr "📧"
+
+#: .\templates\core\verificar_email.html:11
+msgid "Verifica el teu email"
+msgstr "Verifica tu correo electrónico"
+
+#: .\templates\core\verificar_email.html:52
+msgid "15 minuts"
+msgstr "15 minutos"
+
+#: .\templates\core\verificar_email.html:57
+msgid "No has rebut el codi?"
+msgstr "¿No recibiste el código?"
+
+#~ msgid "Explica per què t"
+#~ msgstr "Explica por qué t"

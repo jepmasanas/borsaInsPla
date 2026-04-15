@@ -1,0 +1,217 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}Les meves ofertes{% endblock %}
+
+{% block content %}
+<div class="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+    <!-- Header section -->
+    <div class="w-full mb-6 sm:mb-8 md:mb-10">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 sm:gap-6 mb-6">
+            <div class="min-w-0 flex-1">
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 break-words">
+                    {% trans "Les meves ofertes" %}
+                </h1>
+                <p class="text-sm sm:text-base text-gray-600 mt-2 break-words truncate sm:truncate-none">
+                    {{ perfil.nombre_empresa }}
+                </p>
+            </div>
+            <a href="{% url 'empresa_nueva_oferta' %}"
+               class="w-full sm:w-auto bg-blue-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-center text-sm sm:text-base whitespace-nowrap flex-shrink-0">
+                + Nova oferta
+            </a>
+        </div>
+
+        <!-- Alert de validación -->
+        {% if not perfil.validado %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-700 p-3 sm:p-4 mb-6 rounded">
+            <p class="font-bold text-sm sm:text-base">{% trans "⚠️ Empresa pendent de validació" %}</p>
+            <p class="text-xs sm:text-sm mt-1">{% trans "El vostre perfil està pendent de validació per l'administració. Les ofertes no seran visibles fins que sigui validat." %}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Lista de ofertas -->
+    {% if ofertas %}
+    <div class="w-full space-y-4 sm:space-y-6">
+        {% for oferta in ofertas %}
+        <div class="w-full bg-white rounded-lg shadow-md hover:shadow-lg transition p-4 sm:p-6">
+            <div class="flex flex-col">
+                <!-- Título y badges -->
+                <div class="mb-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3 flex-wrap">
+                        <h3 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 break-words flex-grow">
+                            {{ oferta.titulo }}
+                        </h3>
+
+                        <div class="flex flex-wrap gap-2">
+                            {% if oferta.validada %}
+                            <span class="bg-green-100 text-green-800 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                                ✓ Validada
+                            </span>
+                            {% else %}
+                            <span class="bg-yellow-100 text-yellow-800 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                                ⏳ Pendent
+                            </span>
+                            {% endif %}
+
+                            {% if not oferta.activa %}
+                            <span class="bg-gray-100 text-gray-800 px-2.5 sm:px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
+                                Inactiva
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Tags de modalidad y contrato -->
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <span class="bg-blue-100 text-blue-800 px-2.5 sm:px-3 py-1 rounded-full text-xs whitespace-nowrap">
+                            {{ oferta.get_modalidad_display }}
+                        </span>
+                        <span class="bg-purple-100 text-purple-800 px-2.5 sm:px-3 py-1 rounded-full text-xs whitespace-nowrap">
+                            {{ oferta.get_tipo_contrato_display }}
+                        </span>
+                        {% if oferta.ubicacion %}
+                        <span class="bg-gray-100 text-gray-800 px-2.5 sm:px-3 py-1 rounded-full text-xs whitespace-nowrap">
+                            📍 {{ oferta.ubicacion }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <p class="text-sm sm:text-base text-gray-600 mb-4 break-words">
+                    {{ oferta.descripcion|truncatewords:30 }}
+                </p>
+
+                <!-- Info de fechas y candidatos -->
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-4 sm:mb-0">
+                    <span class="whitespace-nowrap">📅 Publicada: {{ oferta.fecha_publicacion|date:"d/m/Y" }}</span>
+                    <span class="whitespace-nowrap">👥 {{ oferta.inscripciones.count }} inscripcions</span>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0">
+                    <a href="{% url 'empresa_ver_candidatos' oferta.pk %}"
+                       class="w-full sm:w-auto bg-purple-600 text-white px-3 sm:px-4 py-2 rounded hover:bg-purple-700 transition text-xs sm:text-sm font-medium text-center flex items-center justify-center sm:justify-start gap-1 whitespace-nowrap">
+                        👥 Veure candidats
+                        {% if oferta.inscripciones.count > 0 %}
+                        <span class="ml-1 bg-purple-800 px-1.5 sm:px-2 py-0.5 rounded text-xs font-semibold flex-shrink-0">
+                            {{ oferta.inscripciones.count }}
+                        </span>
+                        {% endif %}
+                    </a>
+
+                    <a href="{% url 'empresa_editar_oferta' oferta.pk %}"
+                       class="w-full sm:w-auto bg-gray-100 text-gray-700 px-3 sm:px-4 py-2 rounded hover:bg-gray-200 transition text-xs sm:text-sm font-medium text-center whitespace-nowrap">
+                        ✏️ Editar
+                    </a>
+
+                    <form method="post" action="{% url 'empresa_eliminar_oferta' oferta.pk %}" class="w-full sm:w-auto"
+                          onsubmit="return confirm('Segur que vols eliminar aquesta oferta?');">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="w-full bg-red-100 text-red-700 px-3 sm:px-4 py-2 rounded hover:bg-red-200 transition text-xs sm:text-sm font-medium">
+                            🗑️ Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview de candidatos -->
+            {% if oferta.inscripciones.count > 0 %}
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                    <h4 class="font-semibold text-sm sm:text-base text-gray-700">
+                        {% trans "Últims candidats:" %}
+                    </h4>
+                    <a href="{% url 'empresa_ver_candidatos' oferta.pk %}"
+                       class="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap">
+                        Veure tots →
+                    </a>
+                </div>
+
+                <div class="space-y-2">
+                    {% for inscripcion in oferta.inscripciones.all|slice:":3" %}
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-gray-50 p-3 rounded">
+                        <div class="min-w-0 flex-1">
+                            <p class="font-medium text-sm sm:text-base break-words">
+                                {{ inscripcion.alumno.nom_complet }}
+                            </p>
+                            <p class="text-xs sm:text-sm text-gray-600 truncate">
+                                {{ inscripcion.alumno.get_cicle_display }} - {{ inscripcion.alumno.any_graduacio }}
+                            </p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded whitespace-nowrap flex-shrink-0
+                            {% if inscripcion.estado == 'pendent' %}bg-yellow-100 text-yellow-800
+                            {% elif inscripcion.estado == 'acceptat' %}bg-green-100 text-green-800
+                            {% elif inscripcion.estado == 'rebutjat' %}bg-red-100 text-red-800
+                            {% else %}bg-blue-100 text-blue-800{% endif %}">
+                            {{ inscripcion.get_estado_display }}
+                        </span>
+                    </div>
+                    {% endfor %}
+
+                    {% if oferta.inscripciones.count > 3 %}
+                    <p class="text-xs sm:text-sm text-gray-500 text-center pt-1">
+                        + {{ oferta.inscripciones.count|add:"-3" }} més...
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Empty state -->
+    {% else %}
+    <div class="w-full bg-white rounded-lg shadow-md p-6 sm:p-8 md:p-12 text-center">
+        <div class="text-5xl sm:text-6xl mb-4">{% trans "📋" %}</div>
+        <h3 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+            {% trans "No tens ofertes publicades" %}
+        </h3>
+        <p class="text-sm sm:text-base text-gray-600 mb-6 px-2">
+            {% trans "Comença publicant la teva primera oferta de treball" %}
+        </p>
+        <a href="{% url 'empresa_nueva_oferta' %}"
+           class="inline-block bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-sm sm:text-base">
+            Crear primera oferta
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Mejoras para responsividad en zoom/dezoom */
+    @media (max-width: 640px) {
+        body {
+            font-size: 16px; /* Evita zoom automático en iOS */
+        }
+    }
+
+    /* Asegurar que los elementos no se desborden */
+    * {
+        box-sizing: border-box;
+    }
+
+    /* Para que los overflow se vean mejor en móviles */
+    .truncate-none {
+        white-space: normal;
+    }
+
+    /* Mejorar la legibilidad en cualquier zoom */
+    @media (max-width: 768px) {
+        .text-xs { font-size: 0.8125rem; line-height: 1.25rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-base { font-size: 1rem; line-height: 1.5rem; }
+    }
+
+    /* Prevenir que el contenido se corte */
+    @media (max-width: 480px) {
+        input, button, a {
+            min-height: 44px; /* Apple touch target size */
+        }
+    }
+</style>
+{% endblock %}

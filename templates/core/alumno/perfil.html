@@ -1,0 +1,294 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}El meu perfil{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 py-6">
+    <div class="w-full max-w-4xl mx-auto">
+        <!-- Back link -->
+        <a href="{% url 'alumno_ofertas' %}" class="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 mb-4 text-sm sm:text-base">
+            ← Tornar a les ofertes
+        </a>
+
+        <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-6 break-words">{% trans "El meu perfil" %}</h1>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Información básica -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4">{% trans "Informació bàsica" %}</h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                        <!-- Nom complet -->
+                        <div class="sm:col-span-1 lg:col-span-1">
+                            <label for="nom_complet" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                                Nom complet *
+                            </label>
+                            <input
+                                type="text"
+                                name="nom_complet"
+                                id="nom_complet"
+                                required
+                                value="{{ perfil.nom_complet }}"
+                                class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+
+                        <!-- Cicle -->
+                        <div class="sm:col-span-1 lg:col-span-1">
+                            <label for="cicle" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                                Cicle formatiu *
+                            </label>
+                            <select
+                                name="cicle"
+                                id="cicle"
+                                required
+                                class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                                <option value="DAM" {% if perfil.cicle == 'DAM' %}selected{% endif %}>DAM - Multiplicadora</option>
+                                <option value="SMX" {% if perfil.cicle == 'SMX' %}selected{% endif %}>SMX - Sistemes</option>
+                                <option value="APD" {% if perfil.cicle == 'APD' %}selected{% endif %}>APD - Dependència (Dual)</option>
+                                <option value="CAI" {% if perfil.cicle == 'CAI' %}selected{% endif %}>CAI - Infermeria</option>
+                                <option value="FP_DUAL" {% if perfil.cicle == 'FP_DUAL' %}selected{% endif %}>FP Dual</option>
+                                <option value="ESO" {% if perfil.cicle == 'ESO' %}selected{% endif %}>ESO</option>
+                                <option value="BATX" {% if perfil.cicle == 'BATX' %}selected{% endif %}>Batxillerat</option>
+                                <option value="altres" {% if perfil.cicle == 'altres' %}selected{% endif %}>Altres</option>
+                            </select>
+                        </div>
+
+                        <!-- Any graduació -->
+                        <div class="sm:col-span-2 lg:col-span-1">
+                            <label for="any_graduacio" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                                Any de graduació *
+                            </label>
+                            <input
+                                type="number"
+                                name="any_graduacio"
+                                id="any_graduacio"
+                                min="2020"
+                                max="2030"
+                                required
+                                value="{{ perfil.any_graduacio }}"
+                                class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CV -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4">{% trans "Curriculum Vitae" %}</h2>
+
+                    {% if perfil.cv %}
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 mb-4">
+                        <p class="text-green-800 text-xs sm:text-sm font-medium">{% trans "✓ Tens un CV pujat" %}</p>
+                        <a href="{{ perfil.cv.url }}" target="_blank" class="text-blue-600 hover:text-blue-700 hover:underline text-xs sm:text-sm mt-2 inline-block">
+                            Veure CV actual →
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <label for="cv" class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                            Pujar nou CV (PDF, DOC, DOCX)
+                        </label>
+                        <input
+                            type="file"
+                            name="cv"
+                            id="cv"
+                            accept=".pdf,.doc,.docx"
+                            class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition file:mr-3 file:px-3 file:py-1 file:bg-blue-50 file:text-blue-600 file:rounded file:border-0 file:text-xs file:cursor-pointer hover:file:bg-blue-100"
+                        >
+                        <p class="text-xs text-gray-500 mt-2">
+                            Pujar actualitzat per enviar-lo amb candidatures.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Enlaces profesionales -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4">{% trans "Enllaços professionals" %}</h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div>
+                            <label for="linkedin" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                                LinkedIn
+                            </label>
+                            <input
+                                type="url"
+                                name="linkedin"
+                                id="linkedin"
+                                value="{{ perfil.linkedin }}"
+                                placeholder="https://linkedin.com/in/..."
+                                class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="github" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                                GitHub
+                            </label>
+                            <input
+                                type="url"
+                                name="github"
+                                id="github"
+                                value="{{ perfil.github }}"
+                                placeholder="https://github.com/..."
+                                class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competencias e idiomas -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4">{% trans "Competències i habilitats" %}</h2>
+
+                    <div class="space-y-3 sm:space-y-4">
+                        <div>
+                            <label for="competencies" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                                Competències tècniques i habilitats
+                            </label>
+                            <textarea
+                                name="competencies"
+                                id="competencies"
+                                rows="4"
+                                placeholder="Ex: Java, Python, React, SQL, Treball en equip, Git..."
+                                class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-vertical"
+                            >{{ perfil.competencies }}</textarea>
+                        </div>
+
+                        <div>
+                            <label for="idiomes" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                                Idiomes
+                            </label>
+                            <input
+                                type="text"
+                                name="idiomes"
+                                id="idiomes"
+                                value="{{ perfil.idiomes }}"
+                                placeholder="Ex: Català (natiu), Castellà (natiu), Anglès (B2)"
+                                class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex flex-col xs:flex-row gap-3 sm:gap-4">
+                    <button
+                        type="submit"
+                        class="flex-1 xs:flex-none bg-blue-600 text-white px-4 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold hover:bg-blue-700 active:bg-blue-800 transition text-sm sm:text-base whitespace-nowrap"
+                    >
+                        💾 Guardar canvis
+                    </button>
+                    <a
+                        href="{% url 'alumno_ofertas' %}"
+                        class="flex-1 xs:flex-none text-center px-4 sm:px-8 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition text-sm sm:text-base whitespace-nowrap"
+                    >
+                        Cancel·lar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Clamp para adaptación fluida de tamaños */
+    h1 {
+        font-size: clamp(1.5rem, 5vw, 2.25rem);
+        line-height: 1.2;
+    }
+
+    h2 {
+        font-size: clamp(1.125rem, 3.5vw, 1.875rem);
+        line-height: 1.3;
+    }
+
+    /* Padding fluido */
+    @media (max-width: 640px) {
+        .p-4 { padding: clamp(1rem, 4vw, 1.5rem); }
+    }
+
+    @media (min-width: 641px) {
+        .p-6 { padding: clamp(1.5rem, 4vw, 2.25rem); }
+    }
+
+    /* Prevenir overflow */
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Inputs responsive */
+    input, select, textarea {
+        transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input:focus, select:focus, textarea:focus {
+        transform: translateY(-1px);
+    }
+
+    /* Touch targets */
+    @media (max-width: 640px) {
+        button, input[type="submit"], input[type="file"], input[type="text"],
+        input[type="email"], input[type="url"], input[type="number"],
+        select, textarea {
+            min-height: 44px;
+            font-size: 16px;
+        }
+    }
+
+    /* File input styling */
+    input[type="file"]::file-selector-button {
+        cursor: pointer;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.375rem;
+        border: none;
+        background-color: #eff6ff;
+        color: #2563eb;
+        font-weight: 500;
+        transition: background-color 150ms ease-in-out;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+        background-color: #dbeafe;
+    }
+
+    /* Accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+        }
+    }
+
+    /* Estilos para textarea */
+    textarea {
+        font-family: inherit;
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    /* Grid fluido */
+    @media (max-width: 640px) {
+        .grid {
+            gap: clamp(0.75rem, 3vw, 1rem);
+        }
+    }
+
+    @media (min-width: 641px) {
+        .gap-3 { gap: clamp(0.75rem, 2.5vw, 1rem); }
+        .gap-4 { gap: clamp(1rem, 3vw, 1.5rem); }
+    }
+</style>
+{% endblock %}

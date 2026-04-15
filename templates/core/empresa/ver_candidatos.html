@@ -1,0 +1,313 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+
+{% block title %}Candidats - {{ oferta.titulo }}{% endblock %}
+
+{% block content %}
+<div class="w-full px-4 py-6 max-w-full">
+    <!-- Header -->
+    <div class="mb-6">
+        <a href="{% url 'empresa_ofertas' %}" class="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1 mb-3 text-sm sm:text-base">
+            ← Tornar a les meves ofertes
+        </a>
+        <h1 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-800 break-words">{% trans "Candidats inscrits" %}</h1>
+        <h2 class="text-base sm:text-lg lg:text-xl text-gray-600 mt-2 break-words">{{ oferta.titulo }}</h2>
+        <p class="text-gray-500 text-xs sm:text-sm mt-2">
+            Total de candidats: <strong>{{ inscripciones.count }}</strong>
+        </p>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 mb-6">
+        <form method="get" class="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-end">
+            <div class="w-full sm:flex-1 min-w-0">
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">{% trans "Filtrar per estat" %}</label>
+                <select name="estado" class="w-full px-3 sm:px-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">{% trans "Tots els estats" %}</option>
+                    <option value="pendent" {% if estado_filter == 'pendent' %}selected{% endif %}>Pendent</option>
+                    <option value="revisat" {% if estado_filter == 'revisat' %}selected{% endif %}>Revisat</option>
+                    <option value="acceptat" {% if estado_filter == 'acceptat' %}selected{% endif %}>Acceptat</option>
+                    <option value="rebutjat" {% if estado_filter == 'rebutjat' %}selected{% endif %}>Rebutjat</option>
+                </select>
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button type="submit" class="flex-1 sm:flex-none bg-blue-600 text-white px-3 sm:px-6 py-2 rounded-lg hover:bg-blue-700 transition text-xs sm:text-sm font-medium">
+                    Filtrar
+                </button>
+                {% if estado_filter %}
+                <a href="{% url 'empresa_ver_candidatos' oferta.pk %}" class="flex-1 sm:flex-none bg-gray-200 text-gray-700 px-3 sm:px-6 py-2 rounded-lg hover:bg-gray-300 transition text-xs sm:text-sm font-medium text-center">
+                    Esborrar
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de candidatos -->
+    {% if inscripciones %}
+    <div class="space-y-3 sm:space-y-4">
+        {% for inscripcion in inscripciones %}
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition">
+            <div class="p-3 sm:p-4 lg:p-6 flex flex-col gap-3 sm:gap-4">
+
+                <!-- Row 1: Avatar, Nombre, Estado -->
+                <div class="flex flex-col xs:flex-row xs:items-start gap-3 xs:gap-4">
+                    <div class="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center text-blue-600 font-bold text-base xs:text-lg sm:text-xl">
+                        {{ inscripcion.alumno.nom_complet|first }}
+                    </div>
+
+                    <div class="flex-1 min-w-0 flex flex-col xs:flex-row xs:items-start xs:justify-between xs:gap-3">
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-gray-800 text-base sm:text-lg break-words">{{ inscripcion.alumno.nom_complet }}</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 truncate">{{ inscripcion.alumno.get_cicle_display }}</p>
+                            <p class="text-xs sm:text-sm text-gray-500">Graduació: {{ inscripcion.alumno.any_graduacio }}</p>
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 whitespace-nowrap w-fit
+                            {% if inscripcion.estado == 'pendent' %}bg-yellow-100 text-yellow-800
+                            {% elif inscripcion.estado == 'revisat' %}bg-blue-100 text-blue-800
+                            {% elif inscripcion.estado == 'acceptat' %}bg-green-100 text-green-800
+                            {% elif inscripcion.estado == 'rebutjat' %}bg-red-100 text-red-800
+                            {% endif %}">
+                            {{ inscripcion.get_estado_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Row 2: Contacto (adapta columnas según espacio) -->
+                <div class="grid grid-cols-1 xs:grid-cols-2 gap-2 xs:gap-3 text-xs sm:text-sm text-gray-600 border-y border-gray-200 py-2 xs:py-3">
+                    <div>
+                        <p class="mb-1"><strong>Email:</strong></p>
+                        <p class="truncate"><a href="mailto:{{ inscripcion.alumno.user.email }}" class="text-blue-600 hover:underline">{{ inscripcion.alumno.user.email }}</a></p>
+                        {% if inscripcion.alumno.user.telefono %}
+                        <p class="mt-1"><strong>Tel:</strong> {{ inscripcion.alumno.user.telefono }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        {% if inscripcion.alumno.linkedin or inscripcion.alumno.github %}
+                        <p class="mb-1"><strong>Xarxes:</strong></p>
+                        <div class="flex gap-2 flex-wrap">
+                            {% if inscripcion.alumno.linkedin %}
+                            <a href="{{ inscripcion.alumno.linkedin }}" target="_blank" class="text-blue-600 hover:underline">LinkedIn</a>
+                            {% endif %}
+                            {% if inscripcion.alumno.github %}
+                            <a href="{{ inscripcion.alumno.github }}" target="_blank" class="text-blue-600 hover:underline">GitHub</a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Row 3: Competencias (si existe) -->
+                {% if inscripcion.alumno.competencies %}
+                <div>
+                    <p class="text-xs sm:text-sm font-medium text-gray-700 mb-1">Competències:</p>
+                    <p class="text-xs sm:text-sm text-gray-600 line-clamp-2">{{ inscripcion.alumno.competencies|truncatewords:25 }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Row 4: Carta de presentación (si existe) -->
+                {% if inscripcion.carta_presentacion %}
+                <div class="bg-gray-50 rounded p-2 xs:p-3">
+                    <p class="text-xs sm:text-sm font-medium text-gray-700 mb-1">Carta de presentació:</p>
+                    <p class="text-xs sm:text-sm text-gray-600 line-clamp-3 xs:line-clamp-4">{{ inscripcion.carta_presentacion }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Row 5: Fecha + Acciones (lado a lado o apilado) -->
+                <div class="flex flex-col xs:flex-row xs:items-center xs:justify-between xs:gap-4 pt-2 border-t border-gray-200">
+                    <p class="text-xs text-gray-500 whitespace-nowrap">
+                        📅 {{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}
+                    </p>
+
+                    <div class="flex flex-col xs:flex-row gap-2 xs:gap-3 w-full xs:w-auto">
+                        {% if inscripcion.alumno.cv %}
+                        <a href="{% url 'empresa_descargar_cv' inscripcion.pk %}"
+                           class="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition text-xs sm:text-sm text-center font-medium flex-1 xs:flex-none whitespace-nowrap">
+                            📥 Descarregar CV
+                        </a>
+                        {% else %}
+                        <button disabled class="bg-gray-300 text-gray-500 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm text-center cursor-not-allowed flex-1 xs:flex-none">
+                            Sense CV
+                        </button>
+                        {% endif %}
+
+                        <div class="relative w-full xs:w-auto z-10">
+                            <button type="button" onclick="toggleDropdown(event, {{ inscripcion.pk }})"
+                                    class="w-full xs:w-auto bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition text-xs sm:text-sm font-medium">
+                                Canviar estat ▾
+                            </button>
+                            <div id="dropdown-{{ inscripcion.pk }}" class="hidden absolute right-0 xs:right-0 mt-1 w-full xs:w-48 bg-white rounded-lg shadow-2xl z-[100] border border-gray-200 max-h-60 overflow-y-auto">
+                                <form method="post" action="{% url 'empresa_cambiar_estado_inscripcion' inscripcion.pk %}" class="border-b border-gray-100">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="estado" value="pendent">
+                                    <button type="submit" class="block w-full text-left px-3 sm:px-4 py-2.5 text-xs sm:text-sm hover:bg-gray-100 transition {% if inscripcion.estado == 'pendent' %}bg-blue-50 font-semibold{% endif %}">
+                                        ⏳ Pendent
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'empresa_cambiar_estado_inscripcion' inscripcion.pk %}" class="border-b border-gray-100">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="estado" value="revisat">
+                                    <button type="submit" class="block w-full text-left px-3 sm:px-4 py-2.5 text-xs sm:text-sm hover:bg-gray-100 transition {% if inscripcion.estado == 'revisat' %}bg-blue-50 font-semibold{% endif %}">
+                                        👀 Revisat
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'empresa_cambiar_estado_inscripcion' inscripcion.pk %}" class="border-b border-gray-100">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="estado" value="acceptat">
+                                    <button type="submit" class="block w-full text-left px-3 sm:px-4 py-2.5 text-xs sm:text-sm hover:bg-gray-100 transition {% if inscripcion.estado == 'acceptat' %}bg-blue-50 font-semibold{% endif %}">
+                                        ✅ Acceptat
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'empresa_cambiar_estado_inscripcion' inscripcion.pk %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="estado" value="rebutjat">
+                                    <button type="submit" class="block w-full text-left px-3 sm:px-4 py-2.5 text-xs sm:text-sm hover:bg-gray-100 transition {% if inscripcion.estado == 'rebutjat' %}bg-blue-50 font-semibold{% endif %}">
+                                        ❌ Rebutjat
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-6 sm:p-8 lg:p-12 text-center">
+        <div class="text-4xl sm:text-5xl lg:text-6xl mb-3 sm:mb-4">{% trans "👥" %}</div>
+        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-2 break-words">
+            {% if estado_filter %}
+            No hi ha candidats amb aquest estat
+            {% else %}
+            Encara no hi ha candidats inscrits
+            {% endif %}
+        </h3>
+        <p class="text-xs sm:text-sm lg:text-base text-gray-600">
+            {% if estado_filter %}
+            Prova amb un altre filtre
+            {% else %}
+            Quan els alumnes s'inscriguin apareixeran aquí
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Breakpoints customizados */
+    @media (max-width: 383px) {
+        .text-xs { font-size: 0.7rem; line-height: 0.9rem; }
+    }
+
+    @media (min-width: 384px) and (max-width: 639px) {
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    }
+
+    @media (min-width: 640px) {
+        .text-xs { font-size: 0.8125rem; line-height: 1.125rem; }
+    }
+
+    /* Clamp para adaptar tamaños fluidamente */
+    h1 {
+        font-size: clamp(1.25rem, 4vw, 2.25rem);
+    }
+
+    h2 {
+        font-size: clamp(1rem, 3vw, 1.875rem);
+    }
+
+    h3 {
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+    }
+
+    /* Padding fluido */
+    .p-3 { padding: clamp(0.75rem, 2vw, 1rem); }
+    .p-4 { padding: clamp(1rem, 2.5vw, 1.5rem); }
+    .p-6 { padding: clamp(1.5rem, 3vw, 2.25rem); }
+
+    /* Prevenir overflow */
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Line clamp para mobile */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @media (min-width: 384px) {
+        .xs\:line-clamp-4 {
+            -webkit-line-clamp: 4;
+        }
+    }
+
+    /* Touch-friendly en móvil */
+    @media (max-width: 640px) {
+        button, a[role="button"], input[type="submit"] {
+            min-height: 44px;
+        }
+
+        input, select {
+            font-size: 16px;
+            min-height: 44px;
+        }
+    }
+
+    /* Accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+        }
+    }
+</style>
+
+<script>
+function toggleDropdown(event, id) {
+    // Prevenir que el evento se propague
+    event.stopPropagation();
+    event.preventDefault();
+
+    const dropdown = document.getElementById('dropdown-' + id);
+
+    // Cerrar todos los demás dropdowns primero
+    document.querySelectorAll('[id^="dropdown-"]').forEach(function(el) {
+        if (el.id !== 'dropdown-' + id) {
+            el.classList.add('hidden');
+        }
+    });
+
+    // Toggle del dropdown actual
+    dropdown.classList.toggle('hidden');
+}
+
+// Cerrar dropdowns al hacer clic fuera
+document.addEventListener('click', function(event) {
+    // Si NO es un clic dentro de un dropdown o botón de toggle, cerrar todos
+    const isDropdownClick = event.target.closest('[id^="dropdown-"]');
+    const isToggleButton = event.target.closest('button[onclick*="toggleDropdown"]');
+
+    if (!isDropdownClick && !isToggleButton) {
+        document.querySelectorAll('[id^="dropdown-"]').forEach(function(el) {
+            el.classList.add('hidden');
+        });
+    }
+});
+</script>
+{% endblock %}
