@@ -1,12 +1,12 @@
 # borsaInsPla 💼
-Una plataforma web de bora de treball per l'Institut Pla de l'Estany, conectant alumnes, exalumnes i empreses de Banyoles.
+Una plataforma web de borsa de treball per l'Institut Pla de l'Estany, conectant alumnes, exalumnes i empreses de Banyoles.
 
 ---
 
 ## 🌐 Acceso en Línea
-La plataforma está disponible en: **http://estanyjobs.raspberryip.com:8000/**
+La plataforma está disponible en: **http://estanyjobs.raspberryip.com:8000/** (abans)
 
-Base de datos actual: https://drive.google.com/file/d/1FFB-8FuY7AtbTOpLZhh1sik-TuAJozXA/view?usp=drive_link
+Dump Base de dates actual: https://drive.google.com/file/d/1FFB-8FuY7AtbTOpLZhh1sik-TuAJozXA/view?usp=drive_link
 
 ### Credenciales de Prueba
 Todos los usuarios utilizan la siguiente contraseña: `97v6M2!pe<`
@@ -22,7 +22,7 @@ Todos los usuarios utilizan la siguiente contraseña: `97v6M2!pe<`
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## 🛠️ Tecnologies Utilitzades
 - **Django** - Framework web backend
 - **Python** - Lenguaje principal
 - **HTML5** - Estructura web
@@ -32,7 +32,7 @@ Todos los usuarios utilizan la siguiente contraseña: `97v6M2!pe<`
 
 ---
 
-## 🚀 Instalación Local
+## 🚀 Instalació Local
 
 ### Requisitos Previos
 - Python 3.8+
@@ -79,12 +79,12 @@ Edita el archivo `.env` y rellena los valores necesarios, especialmente `EMAIL_H
 python manage.py migrate
 ```
 
-6. **Crear superusuario**
+6. **Crear superusuari**
 ```bash
 python manage.py createsuperuser
 ```
 
-7. **Ejecutar servidor**
+7. **Executar servidor**
 ```bash
 python manage.py runserver
 ```
@@ -92,14 +92,14 @@ Accede a `http://localhost:8000`
 
 ---
 
-## 🌍 Internacionalización (i18n)
+## 🌍 Internacionalització (i18n)
 
-EstanyJobs soporta tres idiomas:
+borsaInsPla soporta tres idiomas:
 - 🇪🇸 **Català** (idioma por defecto)
 - 🇪🇸 **Español**
 - 🇬🇧 **English**
 
-### Flujo de Trabajo para Traducciones
+### Fluxe de Trabajo para Traducciones
 
 #### 1. Marcar templates para traducción
 Este script modifica tus templates HTML para envolver textos con `{% trans %}`:
