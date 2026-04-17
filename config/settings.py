@@ -62,11 +62,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'estanyjobs_db',
-        'USER': 'estanyjobs_user',
-        'PASSWORD': '1234',
-        'HOST': '192.168.1.99',
-        'PORT': '5432',
+        'NAME': config('DB_NAME', default='borsainspl_db'),
+        'USER': config('DB_USER', default='borsainspl_user'),
+        'PASSWORD': config('DB_PASSWORD', default='1234'),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 # ============================================
@@ -154,4 +154,4 @@ EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='EstanyJobs <noreply@estanyjobs.com>')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='BorsaPla <noreply-borsa@elpla.app>')
