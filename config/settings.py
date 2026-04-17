@@ -62,8 +62,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='borsainspl_db'),
-        'USER': config('DB_USER', default='borsainspl_user'),
+        'NAME': config('DB_NAME', default='borsainspla_db'),
+        'USER': config('DB_USER', default='borsainspla_user'),
         'PASSWORD': config('DB_PASSWORD', default='1234'),
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': config('DB_PORT', default='5432'),
