@@ -64,6 +64,54 @@ cp env.example .env
 ```
 Edita el archivo `.env` y rellena los valores necesarios, especialmente `EMAIL_HOST_PASSWORD`:
 
+5. **Accecir base de dades**
+
+## base de dades ###
+
+Entrar amb: 
+
+```bash
+    sudo su
+    sudo -u postgres psql
+```
+```bash
+    \l
+    \c borsainspla_db
+```
+
+i ara ja pots fer-hi consultes amb sql interatiu, del tipus select * from academy…
+
+si vols saber els noms de les taules, pots fer-ho amb
+
+```bash
+    \dt
+```
+
+i si vols veure la descripció d’una taula concreta
+
+```bash
+ \dt nom taula
+```
+
+
+-- Crear el usuario
+
+```bash
+    CREATE USER borsainspla_user WITH PASSWORD '1234';
+```
+
+-- Crear la base de datos
+
+```bash
+    CREATE DATABASE borsainspla_db OWNER borsainspla_user;
+```
+-- Dar permisos
+
+```bash
+    GRANT ALL PRIVILEGES ON DATABASE borsainspla_db TO borsainspla_user;
+```
+
+
 #### 🔑 Configurar SMTP para notificaciones
 **⚠️ Sin configurar el SMTP, el sistema de notificaciones no funcionará.**
 
