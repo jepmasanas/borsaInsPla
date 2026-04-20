@@ -70,49 +70,51 @@ DATABASES = {
     }
 }
 # ============================================
-# VALIDADORES DE CONTRASEÑA MEJORADOS
+# VALIDADORES DE CONTRASEÑA SIMPLIFICADOS
 # ============================================
 AUTH_PASSWORD_VALIDATORS = [
-    # Validador de similitud con atributos del usuario
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    # Longitud mínima de 10 caracteres (aumentado)
+    # Longitud mínima de 6 caracteres
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
         'OPTIONS': {
-            'min_length': 10,
+            'min_length': 6,
         }
     },
-    # Validador de contraseñas comunes de Django
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    # No permitir contraseñas completamente numéricas
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-    {
-        'NAME': 'core.validators.SequencePasswordValidator',
-        'OPTIONS': {
-            'max_sequence_length': 3,
-        }
-    },
-    # Requiere mayúsculas, minúsculas, números y caracteres especiales
+    # Requiere mayúscula y símbolo
     {
         'NAME': 'core.validators.ComplexityPasswordValidator',
     },
-    # No permitir más de 2 caracteres repetidos (aaa, 111)
-    {
-        'NAME': 'core.validators.RepeatedCharacterValidator',
-        'OPTIONS': {
-            'max_repeated': 2,
-        }
-    },
-    # Bloquea patrones comunes inseguros
-    {
-        'NAME': 'core.validators.CommonPatternsValidator',
-    },
+    
+    # ========== VALIDADORES COMENTADOS (complejidad reducida) ==========
+    # # Validador de similitud con atributos del usuario
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
+    # # Validador de contraseñas comunes de Django
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
+    # # No permitir contraseñas completamente numéricas
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
+    # {
+    #     'NAME': 'core.validators.SequencePasswordValidator',
+    #     'OPTIONS': {
+    #         'max_sequence_length': 3,
+    #     }
+    # },
+    # # No permitir más de 2 caracteres repetidos (aaa, 111)
+    # {
+    #     'NAME': 'core.validators.RepeatedCharacterValidator',
+    #     'OPTIONS': {
+    #         'max_repeated': 2,
+    #     }
+    # },
+    # # Bloquea patrones comunes inseguros
+    # {
+    #     'NAME': 'core.validators.CommonPatternsValidator',
+    # },
 ]
 
 LANGUAGE_CODE = 'ca'  # Idioma por defecto

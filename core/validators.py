@@ -105,8 +105,6 @@ class ComplexityPasswordValidator:
     """
     Valida que la contraseña contenga al menos:
     - 1 mayúscula
-    - 1 minúscula
-    - 1 número
     - 1 carácter especial
     """
 
@@ -117,28 +115,28 @@ class ComplexityPasswordValidator:
                 code='no_uppercase',
             )
 
-        if not re.search(r'[a-z]', password):
-            raise ValidationError(
-                _("La contrasenya ha de contenir almenys una lletra minúscula."),
-                code='no_lowercase',
-            )
-
-        if not re.search(r'[0-9]', password):
-            raise ValidationError(
-                _("La contrasenya ha de contenir almenys un número."),
-                code='no_digit',
-            )
-
         if not re.search(r'[!@#$%^&*()_+\-=\[\]{};:\'",.<>?/\\|`~]', password):
             raise ValidationError(
                 _("La contrasenya ha de contenir almenys un caràcter especial (!@#$%^&*, etc.)."),
                 code='no_special',
             )
 
+        # ========== VALIDACIONES COMENTADAS (complejidad reducida) ==========
+        # if not re.search(r'[a-z]', password):
+        #     raise ValidationError(
+        #         _("La contrasenya ha de contenir almenys una lletra minúscula."),
+        #         code='no_lowercase',
+        #     )
+        #
+        # if not re.search(r'[0-9]', password):
+        #     raise ValidationError(
+        #         _("La contrasenya ha de contenir almenys un número."),
+        #         code='no_digit',
+        #     )
+
     def get_help_text(self):
         return _(
-            "La teva contrasenya ha de contenir almenys una majúscula, "
-            "una minúscula, un número i un caràcter especial."
+            "La teva contrasenya ha de contenir almenys una majúscula i un caràcter especial."
         )
 
 
