@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
-
+r   
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Carregar variables d'entorn ABANS de fer res més
