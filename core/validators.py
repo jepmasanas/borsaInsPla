@@ -1,5 +1,5 @@
 """
-Validadores personalizados de contraseñas para EstanyJobs
+Validadores personalizados de contraseñas para BorsaInsPla
 """
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _

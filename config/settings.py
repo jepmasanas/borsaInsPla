@@ -14,7 +14,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'meter la contraseña en el env de ser posi
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',') if h.strip()]
-#CSRF_TRUSTED_ORIGINS = ['http://estanyjobs.raspberryip.com', 'https://estanyjobs.raspberryip.com']
+#CSRF_TRUSTED_ORIGINS = ['http://borsainspla.raspberryip.com', 'https://borsainspla.raspberryip.com']
 
 # Application definition
 INSTALLED_APPS = [

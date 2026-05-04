@@ -1,8 +1,8 @@
-# TRANSLATION FILE FOR EstanyJobs
+# TRANSLATION FILE FOR BorsaInsPla
 # Copyright (C) 2025
 msgid ""
 msgstr ""
-"Project-Id-Version: EstanyJobs 1.0\n"
+"Project-Id-Version: BorsaInsPla 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-14 15:27+0200\n"
 "Language: en\n"
@@ -797,8 +797,8 @@ msgid "(Alumne)"
 msgstr "(Student)"
 
 #: .\templates\core\base.html:117
-msgid "&copy; 2025 EstanyJobs - Institut Pla de l'Estany"
-msgstr "&copy;2025 EstanyJobs - Institut Pla de l'Estany"
+msgid "&copy; 2025 BorsaInsPla - Institut Pla de l'Estany"
+msgstr "&copy;2025 BorsaInsPla - Institut Pla de l'Estany"
 
 #: .\templates\core\base.html:118
 msgid "Projecte Final DAM 2025-26"

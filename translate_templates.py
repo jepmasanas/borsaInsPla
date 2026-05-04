@@ -117,11 +117,11 @@ class SimpleTemplateTranslator:
         for lang_code, lang_name in [('es', 'Español'), ('en', 'English')]:
             po_file = self.locale_dir / lang_code / 'LC_MESSAGES' / 'django.po'
 
-            header = f'''# TRANSLATION FILE FOR EstanyJobs
+            header = f'''# TRANSLATION FILE FOR BorsaInsPla
 # Copyright (C) 2025
 msgid ""
 msgstr ""
-"Project-Id-Version: EstanyJobs 1.0\\n"
+"Project-Id-Version: BorsaInsPla 1.0\\n"
 "Language: {lang_code}\\n"
 "MIME-Version: 1.0\\n"
 "Content-Type: text/plain; charset=UTF-8\\n"
@@ -225,7 +225,7 @@ msgstr ""
 def main():
     print("="*60)
     print("🌍 TRADUCTOR DE TEMPLATES HTML")
-    print("   EstanyJobs - Català → Español/English")
+    print("   BorsaInsPla - Català → Español/English")
     print("="*60)
 
     # Detectar directorio base

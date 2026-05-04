@@ -5,7 +5,7 @@ from django.conf import settings
 def send_verification_email(user, code):
     """Envía email de verificación con código usando Gmail SMTP"""
 
-    subject = 'Verifica el teu compte - EstanyJobs'
+    subject = 'Verifica el teu compte - BorsaInsPla'
 
     html_message = f"""
     <!DOCTYPE html>
@@ -27,12 +27,12 @@ def send_verification_email(user, code):
     <body>
         <div class="container">
             <div class="header">
-                <h1>🎓 EstanyJobs</h1>
+                <h1>🎓 BorsaInsPla</h1>
                 <p>Borsa de Treball - Institut Pla de l'Estany</p>
             </div>
             <div class="content">
                 <h2>Hola, {user.username}!</h2>
-                <p>Gràcies per registrar-te a EstanyJobs. Per completar el registre, 
+                <p>Gràcies per registrar-te a BorsaInsPla. Per completar el registre, 
                    si us plau verifica el teu compte introduint el següent codi:</p>
 
                 <div class="code">{code}</div>
@@ -42,7 +42,7 @@ def send_verification_email(user, code):
                 <p>Si no has sol·licitat aquest registre, pots ignorar aquest email.</p>
             </div>
             <div class="footer">
-                <p>© 2025 EstanyJobs - Institut Pla de l'Estany</p>
+                <p>© 2025 BorsaInsPla - Institut Pla de l'Estany</p>
                 <p>Aquest és un email automàtic, si us plau no responguis.</p>
             </div>
         </div>
@@ -71,7 +71,7 @@ def send_verification_email(user, code):
 def send_password_recovery_email(user, code):
     """Envía email para recuperación de contraseña"""
 
-    subject = 'Recupera la teva contrasenya - EstanyJobs'
+    subject = 'Recupera la teva contrasenya - BorsaInsPla'
 
     html_message = f"""
     <!DOCTYPE html>
@@ -96,7 +96,7 @@ def send_password_recovery_email(user, code):
         <div class="container">
             <div class="header">
                 <h1>🔑 Recuperació de Contrasenya</h1>
-                <p>EstanyJobs</p>
+                <p>BorsaInsPla</p>
             </div>
             <div class="content">
                 <h2>Hola, {user.username}!</h2>
@@ -115,7 +115,7 @@ def send_password_recovery_email(user, code):
                    <strong>ignora aquest email</strong> i la teva contrasenya romandrà igual.</p>
             </div>
             <div class="footer">
-                <p>© 2025 EstanyJobs - Institut Pla de l'Estany</p>
+                <p>© 2025 BorsaInsPla - Institut Pla de l'Estany</p>
                 <p>Per a qüestions de seguretat, no responguis a aquest email.</p>
             </div>
         </div>
@@ -144,7 +144,7 @@ def send_password_recovery_email(user, code):
 def send_welcome_email(user):
     """Envía email de bienvenida después de verificar"""
 
-    subject = '¡Bienvenido a EstanyJobs!'
+    subject = '¡Bienvenido a BorsaInsPla!'
 
     role_text = "Alumne/Exalumne" if user.role == 'alumno' else "Empresa" if user.role == 'empresa' else "Administrador"
 
@@ -169,7 +169,7 @@ def send_welcome_email(user):
         <div class="container">
             <div class="header">
                 <h1>🎉 ¡Bienvenido!</h1>
-                <p>EstanyJobs - Borsa de Treball</p>
+                <p>BorsaInsPla - Borsa de Treball</p>
             </div>
             <div class="content">
                 <h2>Hola, {user.username}!</h2>
@@ -187,8 +187,8 @@ def send_welcome_email(user):
                 <p>Si tens alguna pregunta o necessites ajuda, no dubtes en contactar amb nosaltres.</p>
             </div>
             <div class="footer">
-                <p>© 2025 EstanyJobs - Institut Pla de l'Estany</p>
-                <p><strong>Email:</strong> support@estanyjobs.com</p>
+                <p>© 2025 BorsaInsPla - Institut Pla de l'Estany</p>
+                <p><strong>Email:</strong> support@borsainspla.com</p>
             </div>
         </div>
     </body>

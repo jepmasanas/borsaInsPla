@@ -4,7 +4,7 @@ Una plataforma web de borsa de treball per l'Institut Pla de l'Estany, conectant
 ---
 
 ## 🌐 Acceso en Línea
-La plataforma está disponible en: **http://estanyjobs.raspberryip.com:8000/** (abans)
+La plataforma está disponible en: **http://borsainspla.raspberryip.com:8000/** (abans: estanyjobs)
 
 Dump Base de dates actual: https://drive.google.com/file/d/1FFB-8FuY7AtbTOpLZhh1sik-TuAJozXA/view?usp=drive_link
 
