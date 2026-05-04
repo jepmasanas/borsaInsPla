@@ -3,6 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from django.db import transaction
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -91,45 +92,55 @@ def registro(request):
                 messages.error(request, 'Any de graduació ha de ser un número.')
                 return redirect('registro')
 
-        # Crear usuario (INACTIVO hasta verificar email)
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            role=role,
-            is_active=False
-        )
+        # Crear usuario, perfil y código de verificación en una transacción atómica
+        try:
+            with transaction.atomic():
+                # Crear usuario (INACTIVO hasta verificar email)
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    role=role,
+                    is_active=False
+                )
 
-        # Crear perfil según rol
-        if role == 'empresa':
-            PerfilEmpresa.objects.create(
-                user=user,
-                nombre_empresa=request.POST.get('nombre_empresa', '').strip(),
-                cif=request.POST.get('cif', '').strip()
-            )
-        elif role == 'alumno':
-            PerfilAlumno.objects.create(
-                user=user,
-                nom_complet=request.POST.get('nom_complet', '').strip(),
-                cicle=request.POST.get('cicle', 'DAM'),
-                any_graduacio=int(request.POST.get('any_graduacio', 2025))
-            )
+                # Crear perfil según rol
+                if role == 'empresa':
+                    PerfilEmpresa.objects.create(
+                        user=user,
+                        nombre_empresa=request.POST.get('nombre_empresa', '').strip(),
+                        cif=request.POST.get('cif', '').strip()
+                    )
+                elif role == 'alumno':
+                    PerfilAlumno.objects.create(
+                        user=user,
+                        nom_complet=request.POST.get('nom_complet', '').strip(),
+                        cicle=request.POST.get('cicle', 'DAM'),
+                        any_graduacio=int(request.POST.get('any_graduacio', 2025))
+                    )
 
-        # Crear código de verificación
-        EmailVerification.objects.filter(user=user).delete()
-        verification = EmailVerification.objects.create(user=user)
+                # Crear código de verificación
+                EmailVerification.objects.filter(user=user).delete()
+                verification = EmailVerification.objects.create(user=user)
 
-        # Enviar email
-        if send_verification_email(user, verification.code):
-            messages.success(
-                request,
-                f'✅ Registre creat! Revisa el teu email ({email}) per verificar el compte.'
-            )
-            request.session['pending_user_id'] = user.id
-            return redirect('verificar_email')
-        else:
-            messages.error(request, '❌ Error enviant l\'email. Contacta amb l\'administrador.')
-            user.delete()
+                # Guardar el user_id en la sesión ANTES de enviar el email
+                request.session['pending_user_id'] = user.id
+                request.session.save()
+
+            # Enviar email (fuera de la transacción)
+            if send_verification_email(user, verification.code):
+                messages.success(
+                    request,
+                    f'✅ Registre creat! Revisa el teu email ({email}) per verificar el compte.'
+                )
+                return redirect('verificar_email')
+            else:
+                messages.error(request, '❌ Error enviant l\'email. Contacta amb l\'administrador.')
+                # Si falla el envío, eliminar todo lo creado
+                user.delete()
+                return redirect('registro')
+        except Exception as e:
+            messages.error(request, f'❌ Error durant el registre: {str(e)}')
             return redirect('registro')
 
     return render(request, 'core/registro.html')
@@ -188,8 +199,10 @@ def verificar_email(request):
                 return redirect('login')
             else:
                 messages.error(request, '❌ Codi incorrecte. Torna-ho a provar.')
+                return redirect('verificar_email')
         except EmailVerification.DoesNotExist:
-            messages.error(request, 'No s\'ha trobat cap codi de verificació.')
+            messages.error(request, 'No s\'ha trobat cap codi de verificació. Prova de reenviar el codi.')
+            return redirect('verificar_email')
 
     context = {'user_email': user.email}
     return render(request, 'core/verificar_email.html', context)
@@ -200,11 +213,11 @@ def reenviar_codigo(request):
     user_id = request.session.get('pending_user_id')
 
     if not user_id:
-        messages.error(request, 'Sessió expirada.')
+        messages.error(request, 'Sessió expirada. Si us plau, torna a registrar-te.')
         return redirect('registro')
 
     try:
-        user = User.objects.get(id=user_id)
+        user = User.objects.get(id=user_id, is_active=False)
 
         # Verificar que no sea muy frecuente (máximo cada 60 segundos)
         try:
@@ -217,11 +230,10 @@ def reenviar_codigo(request):
         except EmailVerification.DoesNotExist:
             pass
 
-        # Eliminar código anterior
-        EmailVerification.objects.filter(user=user).delete()
-
-        # Crear nuevo código
-        verification = EmailVerification.objects.create(user=user)
+        # Eliminar código anterior y crear uno nuevo
+        with transaction.atomic():
+            EmailVerification.objects.filter(user=user).delete()
+            verification = EmailVerification.objects.create(user=user)
 
         # Enviar email
         if send_verification_email(user, verification.code):
@@ -229,7 +241,7 @@ def reenviar_codigo(request):
         else:
             messages.error(request, '❌ Error enviant l\'email. Torna-ho a provar.')
     except User.DoesNotExist:
-        messages.error(request, 'Usuari no trobat.')
+        messages.error(request, 'Usuari no trobat o ja està activat.')
         return redirect('registro')
 
     return redirect('verificar_email')

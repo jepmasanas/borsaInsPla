@@ -155,4 +155,4 @@ class InscripcionAdmin(admin.ModelAdmin):
 # Configuración del sitio admin
 admin.site.site_header = "Borsa de Treball - Institut Pla de l'Estany"
 admin.site.site_title = "Borsa Admin"
-admin.site.index_title = "Panell d'administració"
+admin.site.index_title = "Panell d'administració"   
