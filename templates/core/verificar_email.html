@@ -89,11 +89,14 @@
 
 <script>
 // Auto-submit cuando se introducen 6 dígitos
+let isSubmitting = false;
+
 document.getElementById('code').addEventListener('input', function(e) {
     let value = e.target.value.replace(/\D/g, ''); // Solo números
     e.target.value = value;
 
-    if (value.length === 6) {
+    if (value.length === 6 && !isSubmitting) {
+        isSubmitting = true;
         // Auto-submit después de medio segundo
         setTimeout(() => {
             e.target.form.submit();
@@ -107,11 +110,20 @@ document.getElementById('code').addEventListener('paste', function(e) {
     const numericData = pastedData.replace(/\D/g, '').slice(0, 6);
     e.target.value = numericData;
 
-    if (numericData.length === 6) {
+    if (numericData.length === 6 && !isSubmitting) {
+        isSubmitting = true;
         setTimeout(() => {
             e.target.form.submit();
         }, 500);
     }
+});
+
+// Prevenir múltiples enviaments del formulari
+document.querySelector('form').addEventListener('submit', function(e) {
+    if (isSubmitting) {
+        return true;
+    }
+    isSubmitting = true;
 });
 </script>
 {% endblock %}

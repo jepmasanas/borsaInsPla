@@ -156,6 +156,14 @@ def verificar_email(request):
 
     try:
         user = User.objects.get(id=user_id)
+        
+        # Si l'usuari ja està verificat, redirigir al login
+        if user.email_verified and user.is_active:
+            if 'pending_user_id' in request.session:
+                del request.session['pending_user_id']
+            messages.info(request, 'El teu email ja està verificat. Pots iniciar sessió.')
+            return redirect('login')
+            
     except User.DoesNotExist:
         messages.error(request, 'Usuari no trobat.')
         return redirect('registro')
@@ -189,11 +197,13 @@ def verificar_email(request):
                 # Eliminar código usado
                 verification.delete()
 
-                # Enviar email de bienvenida
-                send_welcome_email(user)
-
                 # Limpiar sesión
-                del request.session['pending_user_id']
+                if 'pending_user_id' in request.session:
+                    del request.session['pending_user_id']
+                    request.session.modified = True
+
+                # Enviar email de bienvenida (después de limpiar sesión)
+                send_welcome_email(user)
 
                 messages.success(request, '✅ Email verificat correctament! Ja pots iniciar sessió.')
                 return redirect('login')
