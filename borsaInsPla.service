@@ -1,0 +1,34 @@
+[Unit]
+Description=Gunicorn daemon for borsaInsPla Django application
+After=network.target
+
+[Service]
+Type=notify
+# Usuari que executa el servei (ajusta segons el teu servidor)
+User=server
+Group=server
+
+# Directori de treball
+WorkingDirectory=/home/server/borsaInsPla
+
+# Entorn virtual
+Environment="PATH=/home/server/borsaInsPla/venv/bin"
+
+# Comanda per executar Gunicorn
+ExecStart=/home/server/borsaInsPla/venv/bin/gunicorn \
+          --config /home/server/borsaInsPla/gunicorn_config.py \
+          config.wsgi:application
+
+# Reiniciar automàticament en cas de fallada
+Restart=on-failure
+RestartSec=5s
+
+# Límits de recursos
+LimitNOFILE=4096
+
+# Logs
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
