@@ -3,5 +3,6 @@ pillow==10.2.0
 python-decouple==3.8
 psycopg2-binary==2.9.9
 django-otp==1.6.1
+whitenoise==6.9.0
 django-chartjs==2.3.0
 dotenv
