@@ -588,7 +588,7 @@ def empresa_nueva_oferta(request):
         return redirect('home')
 
     if request.method == 'POST':
-        Oferta.objects.create(
+        oferta = Oferta.objects.create(
             empresa=perfil,
             titulo=request.POST.get('titulo'),
             descripcion=request.POST.get('descripcion'),
@@ -598,6 +598,17 @@ def empresa_nueva_oferta(request):
             ubicacion=request.POST.get('ubicacion', ''),
             salario=request.POST.get('salario', ''),
         )
+
+        # Notificar a tots els admins
+        admins = User.objects.filter(role='admin')
+        for admin in admins:
+            crear_notificacion(
+                user=admin,
+                mensaje=f"Nova oferta pendent de validació: «{oferta.titulo}» de {perfil.nombre_empresa}.",
+                tipo='nova_oferta_pendent',
+                url='/admin-panel/validar-ofertas/',
+                oferta=oferta,
+            )
 
         messages.success(request, 'Oferta creada correctament. Pendent de validació.')
         return redirect('empresa_ofertas')
