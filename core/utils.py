@@ -3,7 +3,7 @@ from django.conf import settings
 
 
 def send_verification_email(user, code):
-    """Envía email de verificación con código usando Gmail SMTP"""
+    """Envia email de verificació amb codi utilitzant Gmail SMTP"""
 
     subject = 'Verifica el teu compte - BorsaInsPla'
 
@@ -69,7 +69,7 @@ def send_verification_email(user, code):
 
 
 def send_password_recovery_email(user, code):
-    """Envía email para recuperación de contraseña"""
+    """Envia email per recuperació de contrasenya"""
 
     subject = 'Recupera la teva contrasenya - BorsaInsPla'
 
@@ -133,16 +133,16 @@ def send_password_recovery_email(user, code):
             fail_silently=False,
         )
 
-        print(f"Email de recuperación enviado a {user.email}")
+        print(f"Email de recuperació enviado a {user.email}")
         return True
 
     except Exception as e:
-        print(f"Error enviando email de recuperación: {e}")
+        print(f"Error enviant email de recuperació: {e}")
         return False
 
 
 def send_welcome_email(user):
-    """Envía email de bienvenida después de verificar"""
+    """Envia email de benvinguda després de verificar"""
 
     subject = '¡Bienvenido a BorsaInsPla!'
 
@@ -205,9 +205,9 @@ def send_welcome_email(user):
             fail_silently=False,
         )
 
-        print(f"Email de bienvenida enviado a {user.email}")
+        print(f"Email de benvinguda enviat a {user.email}")
         return True
 
     except Exception as e:
-        print(f"Error enviando email de bienvenida: {e}")
+        print(f"Error enviant email de benvinguda: {e}")
         return False

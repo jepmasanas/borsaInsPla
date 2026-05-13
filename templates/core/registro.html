@@ -263,7 +263,7 @@
             const lower = password.toLowerCase();
             let maxSequenceLength = 0;
 
-            // Secuencias numéricas ascendentes
+            // Sequències numèriques ascendentes
             for (let i = 0; i <= password.length - 2; i++) {
                 let seqLength = 1;
                 for (let j = i; j < password.length - 1; j++) {
@@ -280,7 +280,7 @@
                 maxSequenceLength = Math.max(maxSequenceLength, seqLength);
             }
 
-            // Secuencias numéricas descendentes
+            // Sequències numèriques descendentes
             for (let i = 0; i <= password.length - 2; i++) {
                 let seqLength = 1;
                 for (let j = i; j < password.length - 1; j++) {
@@ -297,7 +297,7 @@
                 maxSequenceLength = Math.max(maxSequenceLength, seqLength);
             }
 
-            // Secuencias alfabéticas ascendentes
+            // Sequències alfabètiques ascendentes
             for (let i = 0; i <= lower.length - 2; i++) {
                 let seqLength = 1;
                 for (let j = i; j < lower.length - 1; j++) {
@@ -314,7 +314,7 @@
                 maxSequenceLength = Math.max(maxSequenceLength, seqLength);
             }
 
-            // Secuencias alfabéticas descendentes
+            // Sequències alfabètiques descendentes
             for (let i = 0; i <= lower.length - 2; i++) {
                 let seqLength = 1;
                 for (let j = i; j < lower.length - 1; j++) {
@@ -331,7 +331,7 @@
                 maxSequenceLength = Math.max(maxSequenceLength, seqLength);
             }
 
-            // Secuencias de teclado comunes
+            // Sequències de teclado comunes
             const keyboardSeqs = ['qwerty', 'asdfgh', 'zxcvbn', 'qwertz', 'azerty'];
             for (const seq of keyboardSeqs) {
                 if (lower.includes(seq)) {

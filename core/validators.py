@@ -1,5 +1,5 @@
 """
-Validadores personalizados de contraseñas para BorsaInsPla
+Validadors personalitzats de contrasenyes per a BorsaInsPla
 """
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
@@ -8,21 +8,21 @@ import re
 
 class SequencePasswordValidator:
     """
-    Valida que la contraseña no contenga secuencias consecutivas largas.
-    - Secuencias de 3 caracteres o menos: OK
-    - Secuencias de 4-6 caracteres: Seguridad media (permitido pero advertencia)
-    - Secuencias de 7+ caracteres: Rechazado
+    Valida que la contrasenya no contengui sequencies consecutivas llargues.
+    - Sequències de 3 caracteres o menos: OK
+    - Sequències de 4-6 caracteres: Seguretat media (permitido pero advertencia)
+    - Sequències de 7+ caracteres: Rechazado
     """
 
     def __init__(self, max_sequence_length=3):
         self.max_sequence_length = max_sequence_length
 
     def _get_max_sequence_length(self, password):
-        """Calcula la longitud máxima de secuencia en la contraseña"""
+        """Calcula la longitud màxima de secuencia en la contraseña"""
         password_lower = password.lower()
         max_seq = 0
 
-        # Secuencias numéricas ascendentes
+        # Sequències numèriques ascendentes
         for i in range(len(password) - 1):
             seq_len = 1
             for j in range(i, len(password) - 1):
@@ -35,7 +35,7 @@ class SequencePasswordValidator:
                     break
             max_seq = max(max_seq, seq_len)
 
-        # Secuencias numéricas descendentes
+        # Sequències numèriques descendentes
         for i in range(len(password) - 1):
             seq_len = 1
             for j in range(i, len(password) - 1):
@@ -48,7 +48,7 @@ class SequencePasswordValidator:
                     break
             max_seq = max(max_seq, seq_len)
 
-        # Secuencias alfabéticas ascendentes
+        # Sequències alfabètiques ascendentes
         for i in range(len(password_lower) - 1):
             seq_len = 1
             for j in range(i, len(password_lower) - 1):
@@ -61,7 +61,7 @@ class SequencePasswordValidator:
                     break
             max_seq = max(max_seq, seq_len)
 
-        # Secuencias alfabéticas descendentes
+        # Sequències alfabètiques descendentes
         for i in range(len(password_lower) - 1):
             seq_len = 1
             for j in range(i, len(password_lower) - 1):
@@ -74,7 +74,7 @@ class SequencePasswordValidator:
                     break
             max_seq = max(max_seq, seq_len)
 
-        # Secuencias de teclado comunes
+        # Sequències de teclado comunes
         keyboard_sequences = ['qwerty', 'asdfgh', 'zxcvbn', 'qwertz', 'azerty']
         for seq in keyboard_sequences:
             if seq in password_lower:
@@ -85,7 +85,7 @@ class SequencePasswordValidator:
     def validate(self, password, user=None):
         max_seq_length = self._get_max_sequence_length(password)
 
-        # Rechazar contraseñas con secuencias de 7 o más caracteres
+        # Rebutjar contrasenyes amb Sequències de 7 o més caràcters
         if max_seq_length >= 7:
             raise ValidationError(
                 _("La contrasenya conté seqüències massa llargues (%(length)d caràcters consecutius). "
@@ -167,7 +167,7 @@ class RepeatedCharacterValidator:
 
 class CommonPatternsValidator:
     """
-    Valida que la contraseña no contenga patrones comunes peligrosos
+    Valida que la contrasenya no contengui patrons comuns peligrosos
     """
 
     def validate(self, password, user=None):

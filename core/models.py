@@ -8,7 +8,7 @@ import random
 
 
 class User(AbstractUser):
-    """Usuario extendido con roles"""
+    """Usuari extés amb rols"""
     ROLE_CHOICES = [
         ('admin', _('Administrador')),
         ('empresa', _('Empresa')),
@@ -41,7 +41,7 @@ class User(AbstractUser):
 
 
 class EmailVerification(models.Model):
-    """Códigos de verificación de email"""
+    """Codis de verificació d'email"""
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -79,7 +79,7 @@ class EmailVerification(models.Model):
 
 
 class PasswordRecovery(models.Model):
-    """Códigos de recuperación de contraseña"""
+    """Códis de recuperació de contrasenya"""
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -117,7 +117,7 @@ class PasswordRecovery(models.Model):
 
 
 class PerfilEmpresa(models.Model):
-    """Perfil específico para empresas"""
+    """Perfil específic per empreses"""
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -179,7 +179,7 @@ class PerfilEmpresa(models.Model):
 
 
 class PerfilAlumno(models.Model):
-    """Perfil específico para alumnos/exalumnos"""
+    """Perfil específic per alumnes/exalumnes"""
     CICLO_CHOICES = [
         ('DAM', _('CFGS Desenvolupament d\'Aplicacions Multiplataforma (DAM)')),
         ('SMX', _('CFGM Sistemes microinformàtics i xarxes (SMX)')),

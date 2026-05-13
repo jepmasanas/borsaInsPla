@@ -94,7 +94,7 @@ AUTH_PASSWORD_VALIDATORS = [
     # {
     #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     # },
-    # # No permitir contraseñas completamente numéricas
+    # # No permitir contraseñas completamente numèriques
     # {
     #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     # },

@@ -17,7 +17,7 @@ import json
 
 
 def home(request):
-    """Página de inicio pública"""
+    """Pàgina d'inici pública"""
     ofertas_recientes = Oferta.objects.filter(validada=True, activa=True)[:6]
     context = {
         'ofertas_recientes': ofertas_recientes
@@ -28,7 +28,7 @@ def home(request):
 # ==================== REGISTRO Y VERIFICACIÓN ====================
 
 def registro(request):
-    """Registro de nuevos usuarios con verificación de email"""
+    """Registre de nous usuaris amb verificació de correu electrònic"""
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         email = request.POST.get('email', '').strip()
@@ -36,7 +36,7 @@ def registro(request):
         password2 = request.POST.get('password2')
         role = request.POST.get('role')
 
-        # Validaciones básicas
+        # Validaciones bàsiques
         if not username or not email or not password:
             messages.error(request, 'Tots els camps obligatoris són necessaris.')
             return redirect('registro')
@@ -53,7 +53,7 @@ def registro(request):
             messages.error(request, 'Aquest email ja està registrat.')
             return redirect('registro')
 
-        # Validar contraseña segura
+        # Validar contrasenya segura
         try:
             validate_password(password, user=None)
         except ValidationError as e:
@@ -61,7 +61,7 @@ def registro(request):
                 messages.error(request, error)
             return redirect('registro')
 
-        # Validaciones específicas por rol
+        # Validacions específiques per rol
         if role == 'empresa':
             nombre_empresa = request.POST.get('nombre_empresa', '').strip()
             cif = request.POST.get('cif', '').strip()
@@ -92,10 +92,10 @@ def registro(request):
                 messages.error(request, 'Any de graduació ha de ser un número.')
                 return redirect('registro')
 
-        # Crear usuario, perfil y código de verificación en una transacción atómica
+        # Crear usuari, perfil i codi de verificació en una transacció atòmica
         try:
             with transaction.atomic():
-                # Crear usuario (INACTIVO hasta verificar email)
+                # Crear usuari (INACTIU fins a verificar email)
                 user = User.objects.create_user(
                     username=username,
                     email=email,
@@ -104,7 +104,7 @@ def registro(request):
                     is_active=False
                 )
 
-                # Crear perfil según rol
+                # Crear perfil segons el  rol
                 if role == 'empresa':
                     PerfilEmpresa.objects.create(
                         user=user,
@@ -123,11 +123,11 @@ def registro(request):
                 EmailVerification.objects.filter(user=user).delete()
                 verification = EmailVerification.objects.create(user=user)
 
-                # Guardar el user_id en la sesión ANTES de enviar el email
+                # Guardar l'user_id en la sessió ABANS d'enviar el mail
                 request.session['pending_user_id'] = user.id
                 request.session.save()
 
-            # Enviar email (fuera de la transacción)
+            # Enviar email (fora de la transacció)
             if send_verification_email(user, verification.code):
                 messages.success(
                     request,
@@ -147,7 +147,7 @@ def registro(request):
 
 
 def verificar_email(request):
-    """Vista para introducir el código de verificación"""
+    """Vista per introduir el codi de verificació"""
     user_id = request.session.get('pending_user_id')
 
     if not user_id:
@@ -194,15 +194,15 @@ def verificar_email(request):
                 user.email_verified = True
                 user.save()
 
-                # Eliminar código usado
+                # Eliminar codi usat
                 verification.delete()
 
-                # Limpiar sesión
+                # Netejar la sessió
                 if 'pending_user_id' in request.session:
                     del request.session['pending_user_id']
                     request.session.modified = True
 
-                # Enviar email de bienvenida (después de limpiar sesión)
+                # Enviar email de bienvinguda (després de netejar sessió)
                 send_welcome_email(user)
 
                 messages.success(request, '✅ Email verificat correctament! Ja pots iniciar sessió.')
@@ -219,7 +219,7 @@ def verificar_email(request):
 
 
 def reenviar_codigo(request):
-    """Reenviar código de verificación"""
+    """Reenviar codi de verificació"""
     user_id = request.session.get('pending_user_id')
 
     if not user_id:
@@ -229,7 +229,7 @@ def reenviar_codigo(request):
     try:
         user = User.objects.get(id=user_id, is_active=False)
 
-        # Verificar que no sea muy frecuente (máximo cada 60 segundos)
+        # Verificar que no sigui molt freqüent (màxim cada 60 segons)
         try:
             verification = EmailVerification.objects.get(user=user)
             time_since_creation = timezone.now() - verification.created_at
@@ -240,7 +240,7 @@ def reenviar_codigo(request):
         except EmailVerification.DoesNotExist:
             pass
 
-        # Eliminar código anterior y crear uno nuevo
+        # Eliminar codi anterior i crear-ne un de nou
         with transaction.atomic():
             EmailVerification.objects.filter(user=user).delete()
             verification = EmailVerification.objects.create(user=user)
@@ -257,7 +257,7 @@ def reenviar_codigo(request):
     return redirect('verificar_email')
 
 
-# ==================== RECUPERACIÓN DE CONTRASEÑA ====================
+# ==================== RECUPERACIÓ DE CONTRASENYA ====================
 
 def olvidaste_contrasenya(request):
     """Solicitar recuperación de contraseña - Paso 1"""
@@ -268,13 +268,13 @@ def olvidaste_contrasenya(request):
             messages.error(request, 'Si us plau, introdueix un email o nom d\'usuari.')
             return render(request, 'core/olvidaste_contrasenya.html')
 
-        # ✅ Buscar usuario con Q objects (simplificado)
+        # ✅ Buscar usuari amb Q objects (simplificat)
         try:
             user = User.objects.get(
                 Q(email__iexact=email_or_username) | Q(username__iexact=email_or_username)
             )
         except User.DoesNotExist:
-            # Por seguridad, no revelar si existe o no
+            # Por Seguretat, no revelar si existeix o no
             messages.info(
                 request,
                 '✉️ Si aquest compte existeix, rebràs un email amb les instruccions de recuperació.'
@@ -285,7 +285,7 @@ def olvidaste_contrasenya(request):
                 Q(email__iexact=email_or_username) | Q(username__iexact=email_or_username)
             ).first()
 
-        # Crear código de recuperación
+        # Crear codi de recuperació
         PasswordRecovery.objects.filter(user=user).delete()
         recovery = PasswordRecovery.objects.create(user=user)
 
@@ -376,12 +376,12 @@ def reenviar_codigo_recuperacion(request):
 
 
 def cambiar_contrasenya_recuperacion(request):
-    """Cambiar contraseña - Paso 3"""
+    """Cambiar contrasenya - Paso 3"""
     user_id = request.session.get('recovery_user_id')
     recovery_verified = request.session.get('recovery_verified')
 
     if not user_id or not recovery_verified:
-        messages.error(request, 'Procés invàlid. Si us plau, comença de nou.')
+        messages.error(request, 'Procés no vàlid. Si us plau, comença de nou.')
         return redirect('olvidaste_contrasenya')
 
     try:
@@ -409,13 +409,13 @@ def cambiar_contrasenya_recuperacion(request):
                 messages.error(request, error)
             return redirect('cambiar_contrasenya_recuperacion')
 
-        # Cambiar contraseña y activar cuenta
+        # Cambiar contrasenya i activar conta
         user.set_password(password)
         user.is_active = True
         user.email_verified = True
         user.save()
 
-        # Limpiar tokens y sesiones
+        # Netejar tokens i sesions
         EmailVerification.objects.filter(user=user).delete()
         PasswordRecovery.objects.filter(user=user).delete()
 
@@ -462,7 +462,7 @@ def login_view(request):
 
 @login_required
 def logout_view(request):
-    """Logout de usuarios"""
+    """Logout d'usuaris"""
     logout(request)
     messages.success(request, 'Sessió tancada correctament.')
     return redirect('home')
@@ -475,7 +475,7 @@ def dashboard(request):
     """Dashboard principal que redirige según el rol"""
     user = request.user
 
-    # ✅ Verificar que el perfil existe antes de redirigir
+    # ✅ Verificar que el perfil existeix abans de redirigir
     if user.role == 'admin':
         return redirect('estadisticas')
     elif user.role == 'empresa':
@@ -495,7 +495,7 @@ def dashboard(request):
 
 
 def estadisticas(request):
-    """Página de estadísticas del sistema"""
+    """Pàgina d'estadístiques del sistema"""
     total_usuarios = User.objects.count()
     total_alumnos = User.objects.filter(role='alumno').count()
     total_empresas = User.objects.filter(role='empresa').count()
@@ -548,11 +548,11 @@ def estadisticas(request):
     return render(request, 'core/estadisticas.html', context)
 
 
-# ==================== VISTAS EMPRESA ====================
+# ==================== VISTES EMPRESA ====================
 
 @login_required
 def empresa_ofertas(request):
-    """Dashboard empresa - Listado de ofertas propias"""
+    """Dashboard empresa - Llista d'ofertes propies"""
     if request.user.role != 'empresa':
         messages.error(request, 'No tens permisos per accedir a aquesta pàgina.')
         return redirect('home')
@@ -607,7 +607,7 @@ def empresa_nueva_oferta(request):
 
 @login_required
 def empresa_editar_oferta(request, pk):
-    """Editar oferta existente"""
+    """Editar oferta existent"""
     oferta = get_object_or_404(Oferta, pk=pk, empresa__user=request.user)
 
     if request.method == 'POST':
@@ -641,7 +641,7 @@ def empresa_eliminar_oferta(request, pk):
 
 @login_required
 def empresa_ver_candidatos(request, pk):
-    """Ver todos los candidatos inscritos en una oferta"""
+    """Veure tots els candidats inscrits en una oferta"""
     if request.user.role != 'empresa':
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -663,7 +663,7 @@ def empresa_ver_candidatos(request, pk):
 
 @login_required
 def empresa_cambiar_estado_inscripcion(request, pk):
-    """Cambiar el estado de una inscripción"""
+    """Cambiar l'estat d'una inscripció"""
     if request.user.role != 'empresa':
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -740,11 +740,11 @@ def empresa_descargar_cv(request, inscripcion_id):
     return response
 
 
-# ==================== VISTAS ALUMNO ====================
+# ==================== VISTES ALUMNE ====================
 
 @login_required
 def alumno_perfil(request):
-    """Perfil del alumno"""
+    """Perfil de l'alumne"""
     if request.user.role != 'alumno':
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -777,7 +777,7 @@ def alumno_perfil(request):
 
 @login_required
 def alumno_ofertas(request):
-    """Listado de ofertas para alumnos con búsqueda avanzada"""
+    """Llista d'ofertes per a alumnes amb cerca avançada"""
     if request.user.role != 'alumno':
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -819,7 +819,7 @@ def alumno_ofertas(request):
 
 @login_required
 def alumno_detalle_oferta(request, pk):
-    """Detalle de una oferta"""
+    """Detall d'una oferta"""
     oferta = get_object_or_404(Oferta, pk=pk, validada=True, activa=True)
 
     inscrito = False
@@ -841,7 +841,7 @@ def alumno_detalle_oferta(request, pk):
 
 @login_required
 def alumno_inscribirse(request, pk):
-    """Inscribirse a una oferta"""
+    """Inscribir-se a una oferta"""
     if request.user.role != 'alumno':
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -883,7 +883,7 @@ def alumno_inscribirse(request, pk):
 
 @login_required
 def alumno_inscripciones(request):
-    """Mis inscripciones"""
+    """Les meves inscripcions"""
     if request.user.role != 'alumno':
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -900,7 +900,7 @@ def alumno_inscripciones(request):
 
 @login_required
 def alumno_cancelar_inscripcion(request, pk):
-    """Cancelar una inscripción"""
+    """Cancel·lar un inscripció"""
     if request.user.role != 'alumno':
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -936,11 +936,11 @@ def alumno_cancelar_inscripcion(request, pk):
     return render(request, 'core/alumno/cancelar_inscripcion.html', context)
 
 
-# ==================== VISTAS ADMIN ====================
+# ==================== VISTES ADMIN ====================
 
 @login_required
 def admin_validar_empresas(request):
-    """Vista personalizada para validar empresas"""
+    """Vista personalizada para validar empreses"""
     if not request.user.is_staff:
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -973,7 +973,7 @@ def admin_validar_empresas(request):
 
 @login_required
 def admin_validar_ofertas(request):
-    """Vista personalizada para validar ofertas"""
+    """Vista personalitzada para validar ofertas"""
     if not request.user.is_staff:
         messages.error(request, 'No tens permisos.')
         return redirect('home')
@@ -989,7 +989,7 @@ def admin_validar_ofertas(request):
                 oferta.validada = True
                 oferta.save()
 
-                # Notificación de validación exitosa
+                # Notificació de validació exitosa
                 crear_notificacion(
                     user=oferta.empresa.user,
                     mensaje=f"✅ La teva oferta '{oferta.titulo}' ha estat validada i ara és visible per als alumnes",
@@ -1004,7 +1004,7 @@ def admin_validar_ofertas(request):
                 oferta.activa = False
                 oferta.save()
 
-                # Notificación de rechazo
+                # Notificació de rebuig
                 crear_notificacion(
                     user=oferta.empresa.user,
                     mensaje=f"❌ La teva oferta '{oferta.titulo}' ha estat rebutjada. Si us plau, revisa el contingut i torna-la a publicar si escau",
@@ -1026,11 +1026,11 @@ def admin_validar_ofertas(request):
     return render(request, 'core/admin/validar_ofertas.html', context)
 
 
-# ==================== VISTAS NOTIFICACIONES ====================
+# ==================== VISTES NOTIFICACIONS ====================
 
 @login_required
 def notificaciones_lista(request):
-    """Lista de notificaciones del usuario"""
+    """Lista de notificacions de l'usuario"""
     notificaciones = Notificacion.objects.filter(user=request.user)
     notificaciones.filter(leida=False).update(leida=True)
 
@@ -1040,7 +1040,7 @@ def notificaciones_lista(request):
 
 @login_required
 def notificacion_marcar_leida(request, pk):
-    """Marcar una notificación como leída"""
+    """Marcar una notificació com a llegida"""
     notificacion = get_object_or_404(Notificacion, pk=pk, user=request.user)
     notificacion.leida = True
     notificacion.save()
@@ -1053,7 +1053,7 @@ def notificacion_marcar_leida(request, pk):
 
 @login_required
 def notificaciones_marcar_todas_leidas(request):
-    """Marcar todas las notificaciones como leídas"""
+    """Marcar todas las notificacions com a llegides"""
     Notificacion.objects.filter(user=request.user, leida=False).update(leida=True)
     messages.success(request, 'Totes les notificacions marcades com llegides.')
     return redirect('notificaciones_lista')
@@ -1061,7 +1061,7 @@ def notificaciones_marcar_todas_leidas(request):
 
 @login_required
 def notificacion_eliminar(request, pk):
-    """Eliminar una notificación"""
+    """Eliminar una notificació"""
     if request.method == 'POST':
         notificacion = get_object_or_404(Notificacion, pk=pk, user=request.user)
         notificacion.delete()
@@ -1070,10 +1070,10 @@ def notificacion_eliminar(request, pk):
     return redirect('notificaciones_lista')
 
 
-# ==================== HELPER PARA CREAR NOTIFICACIONES ====================
+# ==================== HELPER PARA CREAR NOTIFICACIONS ====================
 
 def crear_notificacion(user, mensaje, tipo, url='', inscripcion=None, oferta=None):
-    """Función helper para crear notificaciones"""
+    """Funció helper para crear notificacions"""
     Notificacion.objects.create(
         user=user,
         mensaje=mensaje,
@@ -1085,7 +1085,7 @@ def crear_notificacion(user, mensaje, tipo, url='', inscripcion=None, oferta=Non
 
 
 def ajustes(request):
-    """Vista de configuración/ajustes del usuario"""
+    """Vista de configuració/ajustos de l'usuari"""
     context = {
         'current_language': request.LANGUAGE_CODE,
     }

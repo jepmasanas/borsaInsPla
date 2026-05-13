@@ -2,15 +2,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Páginas públicas
+    # Págines públiques
     path('', views.home, name='home'),
 
-    # ===== REGISTRO Y VERIFICACIÓN =====
+    # ===== REGISTRe Y VERIFICACIó =====
     path('registro/', views.registro, name='registro'),
     path('verificar-email/', views.verificar_email, name='verificar_email'),
     path('reenviar-codigo/', views.reenviar_codigo, name='reenviar_codigo'),
 
-    # ===== RECUPERACIÓN DE CONTRASEÑA =====
+    # ===== RECUPERACIÓ DE CONTRASENYA =====
     path('olvide-contrasenya/', views.olvidaste_contrasenya, name='olvidaste_contrasenya'),
     path('verificar-codigo-recuperacion/', views.verificar_codigo_recuperacion, name='verificar_codigo_recuperacion'),
     path('reenviar-codigo-recuperacion/', views.reenviar_codigo_recuperacion, name='reenviar_codigo_recuperacion'),
@@ -21,7 +21,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 
-    # Dashboard según rol
+    # Dashboard segons rol
     path('dashboard/', views.dashboard, name='dashboard'),
     path('estadisticas/', views.estadisticas, name='estadisticas'),
 
@@ -36,7 +36,7 @@ urlpatterns = [
     path('empresa/inscripcion/<int:inscripcion_id>/descargar-cv/', views.empresa_descargar_cv,
          name='empresa_descargar_cv'),
 
-    # Alumno
+    # Alumne
     path('alumno/perfil/', views.alumno_perfil, name='alumno_perfil'),
     path('alumno/ofertas/', views.alumno_ofertas, name='alumno_ofertas'),
     path('alumno/oferta/<int:pk>/', views.alumno_detalle_oferta, name='alumno_detalle_oferta'),
@@ -45,17 +45,17 @@ urlpatterns = [
     path('alumno/inscripcion/<int:pk>/cancelar/', views.alumno_cancelar_inscripcion,
          name='alumno_cancelar_inscripcion'),
 
-    # Admin (validaciones)
+    # Admin (validacions)
     path('admin-panel/validar-empresas/', views.admin_validar_empresas, name='admin_validar_empresas'),
     path('admin-panel/validar-ofertas/', views.admin_validar_ofertas, name='admin_validar_ofertas'),
 
-    # Notificaciones
+    # Notificacions
     path('notificaciones/', views.notificaciones_lista, name='notificaciones_lista'),
     path('notificaciones/<int:pk>/marcar-leida/', views.notificacion_marcar_leida, name='notificacion_marcar_leida'),
     path('notificaciones/marcar-todas-leidas/', views.notificaciones_marcar_todas_leidas,
          name='notificaciones_marcar_todas_leidas'),
     path('notificaciones/<int:pk>/eliminar/', views.notificacion_eliminar, name='notificacion_eliminar'),
 
-    # Ajustes de cuenta
+    # Ajustos de la conta
     path('ajustes/', views.ajustes, name='ajustes'),
 ]
