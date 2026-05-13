@@ -1064,11 +1064,15 @@ def admin_validar_ofertas(request):
 
 # ==================== VISTES NOTIFICACIONS ====================
 
+# Tipus de notificació que no es marquen com llegides automàticament
+TIPOS_PERSISTENTS = {'nova_empresa_pendent', 'nova_oferta_pendent'}
+
+
 @login_required
 def notificaciones_lista(request):
     """Lista de notificacions de l'usuario"""
     notificaciones = Notificacion.objects.filter(user=request.user)
-    notificaciones.filter(leida=False).update(leida=True)
+    notificaciones.filter(leida=False).exclude(tipo__in=TIPOS_PERSISTENTS).update(leida=True)
 
     context = {'notificaciones': notificaciones}
     return render(request, 'core/notificaciones/lista.html', context)
@@ -1078,8 +1082,10 @@ def notificaciones_lista(request):
 def notificacion_marcar_leida(request, pk):
     """Marcar una notificació com a llegida"""
     notificacion = get_object_or_404(Notificacion, pk=pk, user=request.user)
-    notificacion.leida = True
-    notificacion.save()
+
+    if notificacion.tipo not in TIPOS_PERSISTENTS:
+        notificacion.leida = True
+        notificacion.save()
 
     if notificacion.url:
         return redirect(notificacion.url)
@@ -1089,8 +1095,8 @@ def notificacion_marcar_leida(request, pk):
 
 @login_required
 def notificaciones_marcar_todas_leidas(request):
-    """Marcar todas las notificacions com a llegides"""
-    Notificacion.objects.filter(user=request.user, leida=False).update(leida=True)
+    """Marcar todas las notificacions com a llegides (excepte les persistents)"""
+    Notificacion.objects.filter(user=request.user, leida=False).exclude(tipo__in=TIPOS_PERSISTENTS).update(leida=True)
     messages.success(request, 'Totes les notificacions marcades com llegides.')
     return redirect('notificaciones_lista')
 
