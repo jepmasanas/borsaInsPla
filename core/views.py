@@ -202,6 +202,29 @@ def verificar_email(request):
                     del request.session['pending_user_id']
                     request.session.modified = True
 
+                # Notificar admins del nou registre
+                admins = User.objects.filter(role='admin')
+                if user.role == 'empresa':
+                    perfil_empresa = getattr(user, 'perfil_empresa', None)
+                    nom = perfil_empresa.nombre_empresa if perfil_empresa else user.username
+                    for admin in admins:
+                        crear_notificacion(
+                            user=admin,
+                            mensaje=f"Nova empresa pendent de validació: {nom}.",
+                            tipo='nova_empresa_pendent',
+                            url='/admin-panel/validar-empresas/',
+                        )
+                elif user.role == 'alumno':
+                    perfil_alumno = getattr(user, 'perfil_alumno', None)
+                    nom = perfil_alumno.nom_complet if perfil_alumno else user.username
+                    for admin in admins:
+                        crear_notificacion(
+                            user=admin,
+                            mensaje=f"Nou alumne registrat: {nom}.",
+                            tipo='nou_alumno_registrat',
+                            url='/estadisticas/',
+                        )
+
                 # Enviar email de bienvinguda (després de netejar sessió)
                 send_welcome_email(user)
 

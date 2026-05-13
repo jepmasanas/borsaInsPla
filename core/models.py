@@ -397,6 +397,8 @@ class Notificacion(models.Model):
         ('oferta_validada', _('Oferta validada')),
         ('empresa_validada', _('Empresa validada')),
         ('nova_oferta_pendent', _('Nova oferta pendent de validació')),
+        ('nova_empresa_pendent', _('Nova empresa pendent de validació')),
+        ('nou_alumno_registrat', _('Nou alumne registrat')),
     ]
 
     user = models.ForeignKey(
