@@ -7,6 +7,7 @@ from django.db import transaction
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.conf import settings
 from datetime import timedelta
 from .models import (
     User, PerfilEmpresa, PerfilAlumno, Oferta, Inscripcion,
@@ -215,15 +216,16 @@ def verificar_email(request):
                             url='/admin-panel/validar-empresas/',
                         )
                 elif user.role == 'alumno':
-                    perfil_alumno = getattr(user, 'perfil_alumno', None)
-                    nom = perfil_alumno.nom_complet if perfil_alumno else user.username
-                    for admin in admins:
-                        crear_notificacion(
-                            user=admin,
-                            mensaje=f"Nou alumne registrat: {nom}.",
-                            tipo='nou_alumno_registrat',
-                            url='/estadisticas/',
-                        )
+                    if settings.NOTIFY_ADMIN_NEW_STUDENTS:
+                        perfil_alumno = getattr(user, 'perfil_alumno', None)
+                        nom = perfil_alumno.nom_complet if perfil_alumno else user.username
+                        for admin in admins:
+                            crear_notificacion(
+                                user=admin,
+                                mensaje=f"Nou alumne registrat: {nom}.",
+                                tipo='nou_alumno_registrat',
+                                url='/estadisticas/',
+                            )
 
                 # Enviar email de bienvinguda (després de netejar sessió)
                 send_welcome_email(user)
