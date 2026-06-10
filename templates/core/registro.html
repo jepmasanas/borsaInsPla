@@ -33,6 +33,7 @@
                             name="username"
                             id="username"
                             required
+                            value="{{ form_data.username|default:'' }}"
                             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     >
                 </div>
@@ -46,6 +47,7 @@
                             name="email"
                             id="email"
                             required
+                            value="{{ form_data.email|default:'' }}"
                             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     >
                 </div>
@@ -107,8 +109,8 @@
                         onchange="toggleRoleFields()"
                 >
                     <option value="">{% trans "Selecciona..." %}</option>
-                    <option value="alumno">{% trans "Alumne / Exalumne" %}</option>
-                    <option value="empresa">{% trans "Empresa" %}</option>
+                    <option value="alumno" {% if form_data.role == 'alumno' %}selected{% endif %}>{% trans "Alumne / Exalumne" %}</option>
+                    <option value="empresa" {% if form_data.role == 'empresa' %}selected{% endif %}>{% trans "Empresa" %}</option>
                 </select>
             </div>
 
@@ -122,6 +124,7 @@
                             type="text"
                             name="nom_complet"
                             id="nom_complet"
+                            value="{{ form_data.nom_complet|default:'' }}"
                             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     >
                 </div>
@@ -137,13 +140,13 @@
                                 class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         >
                             <option value="">Selecciona...</option>
-                            <option value="DAM">CFGS DAM - Desenvolupament d'Aplicacions Multiplataforma</option>
-                            <option value="SMX">CFGM SMX - Sistemes microinformàtics i xarxes</option>
-                            <option value="APD">CFGM APD - Atenció a la dependència (Dual)</option>
-                            <option value="CAI">CFGM CAI - Cures Auxiliars d'Infermeria</option>
-                            <option value="ESO">ESO - Educació Secundària Obligatòria</option>
-                            <option value="BATX">Batxillerat</option>
-                            <option value="altres">Altres</option>
+                            <option value="DAM" {% if form_data.cicle == 'DAM' %}selected{% endif %}>CFGS DAM - Desenvolupament d'Aplicacions Multiplataforma</option>
+                            <option value="SMX" {% if form_data.cicle == 'SMX' %}selected{% endif %}>CFGM SMX - Sistemes microinformàtics i xarxes</option>
+                            <option value="APD" {% if form_data.cicle == 'APD' %}selected{% endif %}>CFGM APD - Atenció a la dependència (Dual)</option>
+                            <option value="CAI" {% if form_data.cicle == 'CAI' %}selected{% endif %}>CFGM CAI - Cures Auxiliars d'Infermeria</option>
+                            <option value="ESO" {% if form_data.cicle == 'ESO' %}selected{% endif %}>ESO - Educació Secundària Obligatòria</option>
+                            <option value="BATX" {% if form_data.cicle == 'BATX' %}selected{% endif %}>Batxillerat</option>
+                            <option value="altres" {% if form_data.cicle == 'altres' %}selected{% endif %}>Altres</option>
                         </select>
                     </div>
 
@@ -156,8 +159,8 @@
                                 name="any_graduacio"
                                 id="any_graduacio"
                                 min="2020"
-                                max="2030"
-                                value="2025"
+                                max="{{ current_year }}"
+                                value="{{ form_data.any_graduacio|default:current_year }}"
                                 class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                         >
                     </div>
@@ -174,6 +177,7 @@
                             type="text"
                             name="nombre_empresa"
                             id="nombre_empresa"
+                            value="{{ form_data.nombre_empresa|default:'' }}"
                             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     >
                 </div>
@@ -186,6 +190,7 @@
                             type="text"
                             name="cif"
                             id="cif"
+                            value="{{ form_data.cif|default:'' }}"
                             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     >
                 </div>
@@ -487,5 +492,10 @@
             alert('Si us plau, compleix tots els requisits de la contrasenya abans de continuar.');
         }
     });
+
+    // Restaurar camps de rol si hi ha dades del formulari (error de validació)
+    {% if form_data.role %}
+    toggleRoleFields();
+    {% endif %}
 </script>
 {% endblock %}

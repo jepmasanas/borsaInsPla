@@ -8,7 +8,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.conf import settings
-from datetime import timedelta
+from datetime import timedelta, date
 from .models import (
     User, PerfilEmpresa, PerfilAlumno, Oferta, Inscripcion,
     EmailVerification, PasswordRecovery, Notificacion
@@ -30,29 +30,34 @@ def home(request):
 
 def registro(request):
     """Registre de nous usuaris amb verificació de correu electrònic"""
+    current_year = date.today().year
+
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
+        username = request.POST.get('username', '').strip().lower()
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
         role = request.POST.get('role')
 
+        def render_error(msg):
+            messages.error(request, msg)
+            return render(request, 'core/registro.html', {
+                'form_data': request.POST,
+                'current_year': current_year,
+            })
+
         # Validaciones bàsiques
         if not username or not email or not password:
-            messages.error(request, 'Tots els camps obligatoris són necessaris.')
-            return redirect('registro')
+            return render_error('Tots els camps obligatoris són necessaris.')
 
         if password != password2:
-            messages.error(request, 'Les contrasenyes no coincideixen.')
-            return redirect('registro')
+            return render_error('Les contrasenyes no coincideixen.')
 
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Aquest nom d\'usuari ja existeix.')
-            return redirect('registro')
+        if User.objects.filter(username__iexact=username).exists():
+            return render_error('Aquest nom d\'usuari ja existeix.')
 
         if User.objects.filter(email=email).exists():
-            messages.error(request, 'Aquest email ja està registrat.')
-            return redirect('registro')
+            return render_error('Aquest email ja està registrat.')
 
         # Validar contrasenya segura
         try:
@@ -60,7 +65,10 @@ def registro(request):
         except ValidationError as e:
             for error in e.messages:
                 messages.error(request, error)
-            return redirect('registro')
+            return render(request, 'core/registro.html', {
+                'form_data': request.POST,
+                'current_year': current_year,
+            })
 
         # Validacions específiques per rol
         if role == 'empresa':
@@ -68,12 +76,10 @@ def registro(request):
             cif = request.POST.get('cif', '').strip()
 
             if not nombre_empresa or not cif:
-                messages.error(request, 'Nom d\'empresa i CIF són obligatoris.')
-                return redirect('registro')
+                return render_error('Nom d\'empresa i CIF són obligatoris.')
 
             if PerfilEmpresa.objects.filter(cif=cif).exists():
-                messages.error(request, 'Aquest CIF ja està registrat.')
-                return redirect('registro')
+                return render_error('Aquest CIF ja està registrat.')
 
         elif role == 'alumno':
             nom_complet = request.POST.get('nom_complet', '').strip()
@@ -81,17 +87,14 @@ def registro(request):
             any_graduacio = request.POST.get('any_graduacio', '')
 
             if not nom_complet or not cicle or not any_graduacio:
-                messages.error(request, 'Tots els camps d\'alumne són obligatoris.')
-                return redirect('registro')
+                return render_error('Tots els camps d\'alumne són obligatoris.')
 
             try:
                 any_graduacio = int(any_graduacio)
-                if any_graduacio < 2020 or any_graduacio > 2030:
-                    messages.error(request, 'Any de graduació no vàlid.')
-                    return redirect('registro')
+                if any_graduacio < 2020 or any_graduacio > current_year:
+                    return render_error('Any de graduació no vàlid.')
             except ValueError:
-                messages.error(request, 'Any de graduació ha de ser un número.')
-                return redirect('registro')
+                return render_error('Any de graduació ha de ser un número.')
 
         # Crear usuari, perfil i codi de verificació en una transacció atòmica
         try:
@@ -117,7 +120,7 @@ def registro(request):
                         user=user,
                         nom_complet=request.POST.get('nom_complet', '').strip(),
                         cicle=request.POST.get('cicle', 'DAM'),
-                        any_graduacio=int(request.POST.get('any_graduacio', 2025))
+                        any_graduacio=int(request.POST.get('any_graduacio', current_year))
                     )
 
                 # Crear código de verificación
@@ -137,14 +140,19 @@ def registro(request):
                 return redirect('verificar_email')
             else:
                 messages.error(request, '❌ Error enviant l\'email. Contacta amb l\'administrador.')
-                # Si falla el envío, eliminar todo lo creado
                 user.delete()
-                return redirect('registro')
+                return render(request, 'core/registro.html', {
+                    'form_data': request.POST,
+                    'current_year': current_year,
+                })
         except Exception as e:
             messages.error(request, f'❌ Error durant el registre: {str(e)}')
-            return redirect('registro')
+            return render(request, 'core/registro.html', {
+                'form_data': request.POST,
+                'current_year': current_year,
+            })
 
-    return render(request, 'core/registro.html')
+    return render(request, 'core/registro.html', {'current_year': current_year})
 
 
 def verificar_email(request):
@@ -795,7 +803,7 @@ def alumno_perfil(request):
         perfil.nom_complet = request.POST.get('nom_complet')
         perfil.cicle = request.POST.get('cicle')
         perfil.any_graduacio = request.POST.get('any_graduacio')
-        perfil.linkedin = request.POST.get('linkedin', '')
+        perfil.linkedin = request.POST.get('linkedin') or None
         perfil.github = request.POST.get('github', '')
         perfil.competencies = request.POST.get('competencies', '')
         perfil.idiomes = request.POST.get('idiomes', '')
