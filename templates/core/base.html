@@ -59,11 +59,6 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
-                    <!-- Ajustes -->
-                    <a href="{% url 'ajustes' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
-                        ⚙️ {% trans "Ajustos" %}
-                    </a>
-
                     {% if user.is_authenticated %}
                         <span class="text-gray-700 px-3 py-2 text-sm whitespace-nowrap">
                             Hola, <strong class="max-w-[100px] xl:max-w-[150px] inline-block truncate align-bottom">{{ user.username }}</strong>
@@ -152,11 +147,6 @@
         <!-- Mobile menu -->
         <div id="mobileMenu" class="hidden lg:hidden border-t border-gray-200 bg-white">
             <div class="px-4 pt-2 pb-3 space-y-1">
-                <!-- Ajustes -->
-                <a href="{% url 'ajustes' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
-                    ⚙️ {% trans "Ajustes" %}
-                </a>
-
                 {% if user.is_authenticated %}
                     <div class="px-3 py-2.5 text-gray-700 text-sm border-b border-gray-200 mb-1">
                         Hola, <strong>{{ user.username }}</strong>

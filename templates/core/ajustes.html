@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Ajustes" %}{% endblock %}
+{% block title %}Configuració{% endblock %}
 
 {% block content %}
 <div class="container mx-auto max-w-5xl">
@@ -9,126 +9,12 @@
     <div class="mb-6 sm:mb-8 lg:mb-10">
         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 flex items-center gap-2 sm:gap-3">
             <span class="text-3xl sm:text-4xl">⚙️</span>
-            <span>{% trans "Configuració" %}</span>
+            <span>Configuració</span>
         </h1>
         <p class="text-sm sm:text-base lg:text-lg text-gray-600 mt-2">
-            {% trans "Personalitza la teva experiència a BorsaInsPla" %}
+            Configuració de BorsaInsPla
         </p>
     </div>
 
-    <!-- Card principal -->
-    <div class="bg-white rounded-xl shadow-xl overflow-hidden">
-        <!-- Sección de idioma -->
-        <div class="p-4 sm:p-6 lg:p-8 xl:p-10">
-            <div class="flex items-center gap-3 mb-6 lg:mb-8">
-                <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span class="text-2xl sm:text-3xl lg:text-4xl">🌍</span>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h2 class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-semibold text-gray-900">
-                        {% trans "Idioma / Language" %}
-                    </h2>
-                    <p class="text-xs sm:text-sm lg:text-base text-gray-600 mt-1">
-                        {% trans "Selecciona l'idioma de l'aplicació" %}
-                    </p>
-                </div>
-            </div>
-
-            <!-- Grid de idiomas -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
-                <!-- Català -->
-                <form action="{% url 'set_language' %}" method="post" class="contents">
-                    {% csrf_token %}
-                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                    <input type="hidden" name="language" value="ca">
-                    <button type="submit" class="w-full p-5 sm:p-6 lg:p-7 xl:p-8 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] {% if LANGUAGE_CODE == 'ca' %}border-blue-500 bg-blue-50 shadow-lg{% else %}border-gray-300 bg-white hover:border-blue-400{% endif %}">
-                        <div class="flex flex-col items-center space-y-2 sm:space-y-3">
-                            <span class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold">CA</span>
-                            <span class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900">Català</span>
-                            {% if LANGUAGE_CODE == 'ca' %}
-                                <span class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm lg:text-base font-semibold bg-blue-500 text-white shadow-md">
-                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    {% trans "Actiu" %}
-                                </span>
-                            {% endif %}
-                        </div>
-                    </button>
-                </form>
-
-                <!-- Español -->
-                <form action="{% url 'set_language' %}" method="post" class="contents">
-                    {% csrf_token %}
-                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                    <input type="hidden" name="language" value="es">
-                    <button type="submit" class="w-full p-5 sm:p-6 lg:p-7 xl:p-8 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] {% if LANGUAGE_CODE == 'es' %}border-blue-500 bg-blue-50 shadow-lg{% else %}border-gray-300 bg-white hover:border-blue-400{% endif %}">
-                        <div class="flex flex-col items-center space-y-2 sm:space-y-3">
-                            <span class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold">ES</span>
-                            <span class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900">Español</span>
-                            {% if LANGUAGE_CODE == 'es' %}
-                                <span class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm lg:text-base font-semibold bg-blue-500 text-white shadow-md">
-                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    Activo
-                                </span>
-                            {% endif %}
-                        </div>
-                    </button>
-                </form>
-
-                <!-- English -->
-                <form action="{% url 'set_language' %}" method="post" class="contents sm:col-span-2 lg:col-span-1">
-                    {% csrf_token %}
-                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
-                    <input type="hidden" name="language" value="en">
-                    <button type="submit" class="w-full p-5 sm:p-6 lg:p-7 xl:p-8 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] {% if LANGUAGE_CODE == 'en' %}border-blue-500 bg-blue-50 shadow-lg{% else %}border-gray-300 bg-white hover:border-blue-400{% endif %}">
-                        <div class="flex flex-col items-center space-y-2 sm:space-y-3">
-                            <span class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold">GB</span>
-                            <span class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900">English</span>
-                            {% if LANGUAGE_CODE == 'en' %}
-                                <span class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm lg:text-base font-semibold bg-blue-500 text-white shadow-md">
-                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 mr-1.5 sm:mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    Active
-                                </span>
-                            {% endif %}
-                        </div>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Info adicional -->
-        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 sm:p-6 lg:p-8 border-t-2 border-blue-200">
-            <div class="flex items-start gap-3 sm:gap-4">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 lg:w-12 lg:h-12 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <h3 class="text-sm sm:text-base lg:text-lg xl:text-xl font-bold text-blue-900 mb-1 sm:mb-2">
-                        {% trans "Nota:" %}
-                    </h3>
-                    <p class="text-xs sm:text-sm lg:text-base text-blue-800 leading-relaxed">
-                        {% trans "Els canvis d'idioma s'apliquen immediatament i es recordaran en futures visites." %}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Botón volver -->
-    <div class="mt-6 sm:mt-8 flex justify-center">
-        <a href="javascript:history.back()" class="inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-6 lg:px-8 py-2.5 sm:py-3 lg:py-4 border-2 border-gray-300 shadow-lg text-sm sm:text-base lg:text-lg xl:text-xl font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-200 hover:scale-105 active:scale-95">
-            <svg class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-            <span>{% trans "Tornar" %}</span>
-        </a>
-    </div>
 </div>
 {% endblock %}
