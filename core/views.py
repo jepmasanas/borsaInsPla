@@ -221,7 +221,7 @@ def verificar_email(request):
                             user=admin,
                             mensaje=f"Nova empresa pendent de validació: {nom}.",
                             tipo='nova_empresa_pendent',
-                            url='/admin-panel/validar-empresas/',
+                            url='/admin-panel/validar-empreses/',
                         )
                 elif user.role == 'alumno':
                     if settings.NOTIFY_ADMIN_NEW_STUDENTS:
@@ -232,7 +232,7 @@ def verificar_email(request):
                                 user=admin,
                                 mensaje=f"Nou alumne registrat: {nom}.",
                                 tipo='nou_alumno_registrat',
-                                url='/estadisticas/',
+                                url='/estadistiques/',
                             )
 
                 # Enviar email de bienvinguda (després de netejar sessió)
@@ -670,7 +670,7 @@ def empresa_nueva_oferta(request):
                 user=admin,
                 mensaje=f"Nova oferta pendent de validació: «{oferta.titulo}» de {perfil.nombre_empresa}.",
                 tipo='nova_oferta_pendent',
-                url='/admin-panel/validar-ofertas/',
+                url='/admin-panel/validar-ofertes/',
                 oferta=oferta,
             )
 
@@ -769,7 +769,7 @@ def empresa_cambiar_estado_inscripcion(request, pk):
                 user=inscripcion.alumno.user,
                 mensaje=f"{emoji_map.get(nuevo_estado, '📬')} L'estat de la teva inscripció a '{inscripcion.oferta.titulo}' ha canviat a: {estado_label}",
                 tipo='estado_cambio',
-                url='/alumno/mis-inscripciones/',
+                url='/alumne/les-meves-inscripcions/',
                 inscripcion=inscripcion,
                 oferta=inscripcion.oferta
             )
@@ -944,7 +944,7 @@ def alumno_inscribirse(request, pk):
             user=oferta.empresa.user,
             mensaje=f"🎓 {perfil.nom_complet} s'ha inscrit a la teva oferta '{oferta.titulo}'",
             tipo='inscripcion',
-            url=f'/empresa/oferta/{oferta.pk}/candidatos/',
+            url=f'/empresa/oferta/{oferta.pk}/candidats/',
             inscripcion=inscripcion,
             oferta=oferta
         )
@@ -1071,7 +1071,7 @@ def admin_validar_ofertas(request):
                     user=oferta.empresa.user,
                     mensaje=f"✅ La teva oferta '{oferta.titulo}' ha estat validada i ara és visible per als alumnes",
                     tipo='validacion',
-                    url=f'/empresa/ofertas/',
+                    url=f'/empresa/ofertes/',
                     oferta=oferta
                 )
 

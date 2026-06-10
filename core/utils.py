@@ -218,7 +218,7 @@ def send_nueva_inscripcion_email(empresa_user, alumno_perfil, oferta):
 
     subject = f'Nova inscripció a "{oferta.titulo}" - BorsaInsPla'
 
-    candidatos_url = f'/empresa/oferta/{oferta.pk}/candidatos/'
+    candidatos_url = f'/empresa/oferta/{oferta.pk}/candidats/'
 
     html_message = f"""
     <!DOCTYPE html>
