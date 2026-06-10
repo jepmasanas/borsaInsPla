@@ -105,6 +105,7 @@
                             <a href="{% url 'alumno_inscripciones' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
                                 📝 Inscripcions
                             </a>
+                        {% elif user.role == 'empresa' %}
                             <a href="{% url 'empresa_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
                                 📋 Les Meves Ofertes
                             </a>
