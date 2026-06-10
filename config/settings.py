@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,7 +33,6 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -121,18 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
     # },
 ]
 
-LANGUAGE_CODE = 'ca'  # Idioma por defecto
-
-# Idiomas disponibles
-LANGUAGES = [
-    ('ca', _('Català')),
-    ('es', _('Español')),
-    ('en', _('English')),
-]
-
-LOCALE_PATHS = [
-    BASE_DIR / 'locale',
-]
+LANGUAGE_CODE = 'ca'
 
 TIME_ZONE = 'Europe/Madrid'
 USE_I18N = True
