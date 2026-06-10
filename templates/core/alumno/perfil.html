@@ -177,6 +177,38 @@
                     </div>
                 </div>
 
+                <!-- Correu electrònic -->
+                <div class="border-b border-gray-200 pb-6">
+                    <h2 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-4">Correu electrònic</h2>
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <div class="flex-1">
+                            <p class="text-xs sm:text-sm text-gray-500 mb-1">Adreça actual</p>
+                            <p class="text-sm sm:text-base font-medium text-gray-800">{{ request.user.email }}</p>
+                        </div>
+                        <button type="button" onclick="document.getElementById('seccioCanviEmail').classList.toggle('hidden')"
+                            class="text-sm text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap">
+                            ✏️ Canviar correu
+                        </button>
+                    </div>
+                    <div id="seccioCanviEmail" class="hidden mt-4">
+                        <form method="post" action="{% url 'canviar_email' %}" class="flex flex-col sm:flex-row gap-2">
+                            {% csrf_token %}
+                            <input
+                                type="email"
+                                name="nou_email"
+                                required
+                                placeholder="nou@correu.cat"
+                                class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                            >
+                            <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap">
+                                Enviar codi
+                            </button>
+                        </form>
+                        <p class="text-xs text-gray-500 mt-2">⚠️ Hauràs de verificar el nou correu amb un codi. El compte quedarà inactiu fins que ho facis.</p>
+                    </div>
+                </div>
+
                 <!-- Botones -->
                 <div class="flex flex-col xs:flex-row gap-3 sm:gap-4">
                     <button

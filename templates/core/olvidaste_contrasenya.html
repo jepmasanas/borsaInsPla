@@ -41,6 +41,7 @@
                     name="email_or_username"
                     id="email_or_username"
                     required
+                    value="{{ form_value|default:'' }}"
                     class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
                     placeholder="{% trans "Email o nom d'usuari" %}"
                     autofocus

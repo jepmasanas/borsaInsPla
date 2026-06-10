@@ -8,12 +8,13 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.conf import settings
+from django.http import JsonResponse
 from datetime import timedelta, date
 from .models import (
     User, PerfilEmpresa, PerfilAlumno, Oferta, Inscripcion,
     EmailVerification, PasswordRecovery, Notificacion
 )
-from .utils import send_verification_email, send_password_recovery_email, send_welcome_email, send_nueva_inscripcion_email
+from .utils import send_verification_email, send_password_recovery_email, send_welcome_email, send_nueva_inscripcion_email, send_notificacio_empresa_email
 import json
 
 
@@ -156,8 +157,9 @@ def registro(request):
 
 
 def verificar_email(request):
-    """Vista per introduir el codi de verificació"""
+    """Vista per introduir el codi de verificació (registre nou o canvi de correu)"""
     user_id = request.session.get('pending_user_id')
+    canvi_email = request.session.get('canvi_email', False)
 
     if not user_id:
         messages.error(request, 'Sessió expirada. Si us plau, torna a registrar-te.')
@@ -165,14 +167,14 @@ def verificar_email(request):
 
     try:
         user = User.objects.get(id=user_id)
-        
-        # Si l'usuari ja està verificat, redirigir al login
-        if user.email_verified and user.is_active:
+
+        # Si l'usuari ja està verificat i no és un canvi de correu, redirigir al login
+        if user.email_verified and user.is_active and not canvi_email:
             if 'pending_user_id' in request.session:
                 del request.session['pending_user_id']
             messages.info(request, 'El teu email ja està verificat. Pots iniciar sessió.')
             return redirect('login')
-            
+
     except User.DoesNotExist:
         messages.error(request, 'Usuari no trobat.')
         return redirect('registro')
@@ -198,7 +200,7 @@ def verificar_email(request):
                         messages.error(request, 'Error: perfil d\'alumne no trobat. Contacta amb l\'administrador.')
                         return redirect('verificar_email')
 
-                # Activar usuario
+                # Activar usuario i verificar email
                 user.is_active = True
                 user.email_verified = True
                 user.save()
@@ -207,9 +209,19 @@ def verificar_email(request):
                 verification.delete()
 
                 # Netejar la sessió
+                canvi_email = request.session.pop('canvi_email', False)
                 if 'pending_user_id' in request.session:
                     del request.session['pending_user_id']
                     request.session.modified = True
+
+                # Si era un canvi de correu, redirigir al perfil
+                if canvi_email:
+                    messages.success(request, '✅ Correu electrònic verificat i actualitzat correctament.')
+                    if user.role == 'alumno':
+                        return redirect('alumno_perfil')
+                    elif user.role == 'empresa':
+                        return redirect('empresa_perfil')
+                    return redirect('home')
 
                 # Notificar admins del nou registre
                 admins = User.objects.filter(role='admin')
@@ -299,7 +311,7 @@ def olvidaste_contrasenya(request):
 
         if not email_or_username:
             messages.error(request, 'Si us plau, introdueix un email o nom d\'usuari.')
-            return render(request, 'core/olvidaste_contrasenya.html')
+            return render(request, 'core/olvidaste_contrasenya.html', {'form_value': email_or_username})
 
         # ✅ Buscar usuari amb Q objects (simplificat)
         try:
@@ -429,18 +441,18 @@ def cambiar_contrasenya_recuperacion(request):
 
         if not password or not password2:
             messages.error(request, 'Tots els camps són obligatoris.')
-            return redirect('cambiar_contrasenya_recuperacion')
+            return render(request, 'core/cambiar_contrasenya_recuperacion.html', context)
 
         if password != password2:
             messages.error(request, 'Les contrasenyes no coincideixen.')
-            return redirect('cambiar_contrasenya_recuperacion')
+            return render(request, 'core/cambiar_contrasenya_recuperacion.html', context)
 
         try:
             validate_password(password, user=user)
         except ValidationError as e:
             for error in e.messages:
                 messages.error(request, error)
-            return redirect('cambiar_contrasenya_recuperacion')
+            return render(request, 'core/cambiar_contrasenya_recuperacion.html', context)
 
         # Cambiar contrasenya i activar conta
         user.set_password(password)
@@ -478,7 +490,7 @@ def login_view(request):
         if user is not None:
             if not user.is_active:
                 messages.error(request, 'Aquesta compte està desactivada.')
-                return redirect('login')
+                return render(request, 'core/login.html', {'form_username': username})
 
             if not user.email_verified:
                 messages.warning(request, 'Si us plau, verifica el teu email primer.')
@@ -490,7 +502,7 @@ def login_view(request):
         else:
             messages.error(request, 'Credencials incorrectes.')
 
-    return render(request, 'core/login.html')
+    return render(request, 'core/login.html', {'form_username': request.POST.get('username', '') if request.method == 'POST' else ''})
 
 
 @login_required
@@ -582,6 +594,56 @@ def estadisticas(request):
 
 
 # ==================== VISTES EMPRESA ====================
+
+@login_required
+def canviar_email(request):
+    """Canviar el correu electrònic de l'usuari amb re-verificació"""
+    if request.method == 'POST':
+        nou_email = request.POST.get('nou_email', '').strip()
+
+        if not nou_email:
+            messages.error(request, 'Has d\'introduir un correu electrònic.')
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+        if nou_email == request.user.email:
+            messages.warning(request, 'El correu introduït és el mateix que l\'actual.')
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+        if User.objects.filter(email=nou_email).exclude(pk=request.user.pk).exists():
+            messages.error(request, 'Aquest correu ja està registrat per un altre usuari.')
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+        try:
+            with transaction.atomic():
+                user = request.user
+                user.email = nou_email
+                user.email_verified = False
+                user.is_active = False
+                user.save()
+
+                EmailVerification.objects.filter(user=user).delete()
+                verification = EmailVerification.objects.create(user=user)
+
+            request.session['pending_user_id'] = user.id
+            request.session['canvi_email'] = True
+            request.session.save()
+
+            if send_verification_email(user, verification.code):
+                messages.success(request, f'✅ S\'ha enviat un codi de verificació a {nou_email}. Revisa el teu correu.')
+                return redirect('verificar_email')
+            else:
+                user.is_active = True
+                user.email_verified = True
+                user.save()
+                messages.error(request, '❌ Error enviant l\'email. El correu no s\'ha canviat.')
+                return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+        except Exception as e:
+            messages.error(request, f'❌ Error canviant el correu: {str(e)}')
+            return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+    return redirect('home')
+
 
 @login_required
 def empresa_perfil(request):
@@ -772,6 +834,17 @@ def empresa_cambiar_estado_inscripcion(request, pk):
                 url='/alumne/les-meves-inscripcions/',
                 inscripcion=inscripcion,
                 oferta=inscripcion.oferta
+            )
+
+            send_notificacio_empresa_email(
+                inscripcion.alumno.user,
+                assumpte=f'Actualització de la teva inscripció a "{inscripcion.oferta.titulo}" - BorsaInsPla',
+                cos_html=(
+                    f'<p>{emoji_map.get(nuevo_estado, "📬")} L\'estat de la teva inscripció a l\'oferta '
+                    f'<strong>"{inscripcion.oferta.titulo}"</strong> '
+                    f'({inscripcion.oferta.empresa.nombre_empresa}) '
+                    f'ha canviat a: <strong>{estado_label}</strong>.</p>'
+                )
             )
 
             messages.success(request, f'Estat canviat a "{estado_label}" correctament.')
@@ -1000,8 +1073,15 @@ def alumno_cancelar_inscripcion(request, pk):
             user=empresa_user,
             mensaje=f"❌ {request.user.perfil_alumno.nom_complet} ha cancel·lat la seva inscripció a '{oferta_titulo}'",
             tipo='inscripcion',
-            url=f'/empresa/oferta/{inscripcion.oferta.pk}/candidatos/',
+            url=f'/empresa/oferta/{inscripcion.oferta.pk}/candidats/',
             oferta=inscripcion.oferta
+        )
+
+        alumne_nom = request.user.perfil_alumno.nom_complet
+        send_notificacio_empresa_email(
+            empresa_user,
+            assumpte=f'Un candidat ha cancel·lat la seva inscripció - BorsaInsPla',
+            cos_html=f'<p>❌ <strong>{alumne_nom}</strong> ha cancel·lat la seva inscripció a l\'oferta <strong>"{oferta_titulo}"</strong>.</p>'
         )
 
         inscripcion.delete()
@@ -1014,6 +1094,51 @@ def alumno_cancelar_inscripcion(request, pk):
 
 
 # ==================== VISTES ADMIN ====================
+
+@login_required
+def admin_enviar_correu(request):
+    """Vista per enviar un correu personalitzat a una empresa"""
+    if not request.user.is_staff:
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    # Buscador AJAX d'empreses
+    if request.GET.get('format') == 'json':
+        q = request.GET.get('q', '').strip()
+        empreses = PerfilEmpresa.objects.filter(
+            nombre_empresa__icontains=q
+        ).select_related('user').values(
+            'id', 'nombre_empresa', 'user__email', 'user__username'
+        )[:10]
+        return JsonResponse({'results': list(empreses)})
+
+    if request.method == 'POST':
+        empresa_id = request.POST.get('empresa_id')
+        assumpte = request.POST.get('assumpte', '').strip()
+        cos = request.POST.get('cos', '').strip()
+
+        if not empresa_id or not assumpte or not cos:
+            messages.error(request, 'Tots els camps són obligatoris.')
+            return render(request, 'core/admin/enviar_correu.html', {'form_data': request.POST})
+
+        try:
+            empresa = PerfilEmpresa.objects.select_related('user').get(id=empresa_id)
+        except PerfilEmpresa.DoesNotExist:
+            messages.error(request, 'Empresa no trobada.')
+            return render(request, 'core/admin/enviar_correu.html', {'form_data': request.POST})
+
+        cos_html = f'<div style="white-space:pre-line">{cos}</div>'
+        ok = send_notificacio_empresa_email(empresa.user, assumpte=assumpte, cos_html=cos_html)
+
+        if ok:
+            messages.success(request, f'✅ Correu enviat correctament a {empresa.nombre_empresa} ({empresa.user.email}).')
+            return redirect('admin_enviar_correu')
+        else:
+            messages.error(request, '❌ Error enviant el correu. Comprova la configuració SMTP.')
+            return render(request, 'core/admin/enviar_correu.html', {'form_data': request.POST})
+
+    return render(request, 'core/admin/enviar_correu.html')
+
 
 @login_required
 def admin_validar_empresas(request):
@@ -1075,6 +1200,12 @@ def admin_validar_ofertas(request):
                     oferta=oferta
                 )
 
+                send_notificacio_empresa_email(
+                    oferta.empresa.user,
+                    assumpte=f'L\'oferta "{oferta.titulo}" ha estat validada - BorsaInsPla',
+                    cos_html=f'<p>✅ La teva oferta <strong>"{oferta.titulo}"</strong> ha estat validada i ara és visible per als alumnes a la plataforma.</p>'
+                )
+
                 messages.success(request, f'Oferta "{oferta.titulo}" validada correctament.')
 
             elif action == 'rechazar':
@@ -1088,6 +1219,12 @@ def admin_validar_ofertas(request):
                     tipo='validacion',
                     url=f'/empresa/oferta/{oferta.id}/editar/',
                     oferta=oferta
+                )
+
+                send_notificacio_empresa_email(
+                    oferta.empresa.user,
+                    assumpte=f'L\'oferta "{oferta.titulo}" ha estat rebutjada - BorsaInsPla',
+                    cos_html=f'<p>❌ La teva oferta <strong>"{oferta.titulo}"</strong> ha estat rebutjada. Si us plau, revisa el contingut i torna-la a publicar si escau.</p>'
                 )
 
                 messages.warning(request, f'Oferta "{oferta.titulo}" rebutjada i desactivada.')

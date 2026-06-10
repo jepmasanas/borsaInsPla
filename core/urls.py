@@ -49,6 +49,7 @@ urlpatterns = [
     # Admin (validacions)
     path('admin-panel/validar-empreses/', views.admin_validar_empresas, name='admin_validar_empresas'),
     path('admin-panel/validar-ofertes/', views.admin_validar_ofertas, name='admin_validar_ofertas'),
+    path('admin-panel/enviar-correu/', views.admin_enviar_correu, name='admin_enviar_correu'),
 
     # Notificacions
     path('notificacions/', views.notificaciones_lista, name='notificaciones_lista'),
@@ -59,4 +60,5 @@ urlpatterns = [
 
     # Ajustos de la conta
     path('configuracio/', views.ajustes, name='ajustes'),
+    path('canviar-email/', views.canviar_email, name='canviar_email'),
 ]

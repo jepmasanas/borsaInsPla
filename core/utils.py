@@ -283,3 +283,53 @@ def send_nueva_inscripcion_email(empresa_user, alumno_perfil, oferta):
     except Exception as e:
         print(f"Error enviant email de nova inscripció: {e}")
         return False
+
+
+def send_notificacio_empresa_email(empresa_user, assumpte, cos_html):
+    """Envia un email de notificació genèric a l'empresa"""
+    html_message = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+                       color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9fafb; padding: 30px; }}
+            .footer {{ background: #1f2937; color: #9ca3af; padding: 20px;
+                      text-align: center; border-radius: 0 0 10px 10px; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎓 BorsaInsPla</h1>
+                <p>Borsa de Treball - Institut Pla de l'Estany</p>
+            </div>
+            <div class="content">
+                <p>Hola, <strong>{empresa_user.username}</strong>!</p>
+                {cos_html}
+            </div>
+            <div class="footer">
+                <p>© 2025 BorsaInsPla - Institut Pla de l'Estany</p>
+                <p>Aquest és un email automàtic, si us plau no responguis.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    try:
+        send_mail(
+            subject=assumpte,
+            message='',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[empresa_user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        print(f"Email '{assumpte}' enviat a {empresa_user.email}")
+        return True
+    except Exception as e:
+        print(f"Error enviant email a {empresa_user.email}: {e}")
+        return False

@@ -92,6 +92,9 @@
                             <a href="{% url 'admin_validar_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
                                 ✅ Validar Ofertes
                             </a>
+                            <a href="{% url 'admin_enviar_correu' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                📧 Enviar correu
+                            </a>
                         {% elif user.role == 'alumno' %}
                             <a href="{% url 'alumno_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
                                 📋 Ofertes
@@ -102,7 +105,6 @@
                             <a href="{% url 'alumno_inscripciones' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
                                 📝 Inscripcions
                             </a>
-                        {% elif user.role == 'empresa' %}
                             <a href="{% url 'empresa_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
                                 📋 Les Meves Ofertes
                             </a>
@@ -171,6 +173,9 @@
                         </a>
                         <a href="{% url 'admin_validar_ofertas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
                             ✅ Validar Ofertes
+                        </a>
+                        <a href="{% url 'admin_enviar_correu' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            📧 Enviar correu
                         </a>
                     {% elif user.role == 'alumno' %}
                         <a href="{% url 'alumno_ofertas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">

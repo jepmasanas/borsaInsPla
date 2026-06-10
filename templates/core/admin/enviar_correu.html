@@ -1,0 +1,187 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Enviar correu a empresa{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-2xl">
+    <!-- Header -->
+    <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-4">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+                    <span>📧</span>
+                    <span>Enviar correu a empresa</span>
+                </h1>
+                <p class="text-sm text-gray-600 mt-1">Redacta i envia un correu personalitzat a qualsevol empresa registrada.</p>
+            </div>
+            <div class="flex gap-2 flex-shrink-0">
+                <a href="{% url 'admin_validar_empresas' %}" class="bg-gray-600 text-white px-3 py-2 rounded-lg hover:bg-gray-700 transition text-xs sm:text-sm font-medium whitespace-nowrap">
+                    🏢 Validar empreses
+                </a>
+                <a href="{% url 'admin_validar_ofertas' %}" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition text-xs sm:text-sm font-medium whitespace-nowrap">
+                    📋 Validar ofertes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+        <form method="post" id="formEnviarCorreu" class="p-6 sm:p-8 space-y-6">
+            {% csrf_token %}
+
+            <!-- Buscador d'empresa -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Empresa destinatària <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                    <input
+                        type="text"
+                        id="cercaEmpresa"
+                        placeholder="Escriu el nom de l'empresa..."
+                        autocomplete="off"
+                        class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >
+                    <!-- Resultats del buscador -->
+                    <div id="resultatsCerca" class="hidden absolute z-20 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-60 overflow-y-auto"></div>
+                </div>
+                <!-- Camp ocult amb l'id seleccionat -->
+                <input type="hidden" name="empresa_id" id="empresaId" value="{{ form_data.empresa_id|default:'' }}" required>
+                <!-- Empresa seleccionada -->
+                <div id="empresaSeleccionada" class="hidden mt-2 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 text-sm text-blue-800">
+                    <span>🏢</span>
+                    <span id="empresaSeleccionadaNom" class="font-medium"></span>
+                    <span id="empresaSeleccionadaEmail" class="text-blue-600"></span>
+                    <button type="button" onclick="netejarSeleccio()" class="ml-auto text-blue-400 hover:text-red-500 transition text-xs">✕ Canviar</button>
+                </div>
+            </div>
+
+            <!-- Assumpte -->
+            <div>
+                <label for="assumpte" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Assumpte <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    name="assumpte"
+                    id="assumpte"
+                    required
+                    value="{{ form_data.assumpte|default:'' }}"
+                    placeholder="Assumpte del correu..."
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                >
+            </div>
+
+            <!-- Cos -->
+            <div>
+                <label for="cos" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Missatge <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                    name="cos"
+                    id="cos"
+                    required
+                    rows="8"
+                    placeholder="Escriu aquí el missatge..."
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                >{{ form_data.cos|default:'' }}</textarea>
+                <p class="text-xs text-gray-400 mt-1">El missatge s'enviarà amb el format de correu de BorsaInsPla i inclourà el salutació i la capçalera automàticament.</p>
+            </div>
+
+            <!-- Botó enviar -->
+            <div class="flex justify-end gap-3">
+                <a href="{% url 'estadisticas' %}" class="px-5 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+                    Cancel·lar
+                </a>
+                <button
+                    type="submit"
+                    id="btnEnviar"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    📤 Enviar correu
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    let cercaTimeout = null;
+
+    const cercaInput = document.getElementById('cercaEmpresa');
+    const resultatsCerca = document.getElementById('resultatsCerca');
+    const empresaId = document.getElementById('empresaId');
+    const empresaSeleccionada = document.getElementById('empresaSeleccionada');
+    const empresaSeleccionadaNom = document.getElementById('empresaSeleccionadaNom');
+    const empresaSeleccionadaEmail = document.getElementById('empresaSeleccionadaEmail');
+
+    // Si ja hi havia una empresa seleccionada (error de formulari), mostrar-la com seleccionada
+    {% if form_data.empresa_id %}
+    cercaInput.classList.add('hidden');
+    empresaSeleccionada.classList.remove('hidden');
+    empresaSeleccionadaNom.textContent = '{{ form_data.empresa_nom|default:"Empresa seleccionada" }}';
+    empresaSeleccionadaEmail.textContent = '{{ form_data.empresa_email|default:"" }}';
+    {% endif %}
+
+    cercaInput.addEventListener('input', function () {
+        const q = this.value.trim();
+        clearTimeout(cercaTimeout);
+
+        if (q.length < 1) {
+            resultatsCerca.innerHTML = '';
+            resultatsCerca.classList.add('hidden');
+            return;
+        }
+
+        cercaTimeout = setTimeout(() => cercarEmpreses(q), 250);
+    });
+
+    function cercarEmpreses(q) {
+        fetch(`{% url 'admin_enviar_correu' %}?format=json&q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(data => {
+                resultatsCerca.innerHTML = '';
+                if (data.results.length === 0) {
+                    resultatsCerca.innerHTML = '<p class="px-4 py-3 text-sm text-gray-500">No s\'han trobat empreses</p>';
+                } else {
+                    data.results.forEach(emp => {
+                        const item = document.createElement('button');
+                        item.type = 'button';
+                        item.className = 'w-full text-left px-4 py-3 hover:bg-blue-50 transition border-b border-gray-100 last:border-0';
+                        item.innerHTML = `
+                            <span class="block font-medium text-gray-800 text-sm">${emp.nombre_empresa}</span>
+                            <span class="block text-xs text-gray-500">${emp.user__email}</span>
+                        `;
+                        item.addEventListener('click', () => seleccionarEmpresa(emp));
+                        resultatsCerca.appendChild(item);
+                    });
+                }
+                resultatsCerca.classList.remove('hidden');
+            });
+    }
+
+    function seleccionarEmpresa(emp) {
+        empresaId.value = emp.id;
+        empresaSeleccionadaNom.textContent = emp.nombre_empresa;
+        empresaSeleccionadaEmail.textContent = emp.user__email;
+        cercaInput.classList.add('hidden');
+        resultatsCerca.classList.add('hidden');
+        empresaSeleccionada.classList.remove('hidden');
+    }
+
+    function netejarSeleccio() {
+        empresaId.value = '';
+        cercaInput.value = '';
+        cercaInput.classList.remove('hidden');
+        empresaSeleccionada.classList.add('hidden');
+        cercaInput.focus();
+    }
+
+    // Tancar resultats si es clica fora
+    document.addEventListener('click', function (e) {
+        if (!cercaInput.contains(e.target) && !resultatsCerca.contains(e.target)) {
+            resultatsCerca.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %}
