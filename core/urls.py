@@ -26,6 +26,7 @@ urlpatterns = [
     path('estadisticas/', views.estadisticas, name='estadisticas'),
 
     # Empresa
+    path('empresa/perfil/', views.empresa_perfil, name='empresa_perfil'),
     path('empresa/ofertas/', views.empresa_ofertas, name='empresa_ofertas'),
     path('empresa/oferta/nueva/', views.empresa_nueva_oferta, name='empresa_nueva_oferta'),
     path('empresa/oferta/<int:pk>/editar/', views.empresa_editar_oferta, name='empresa_editar_oferta'),

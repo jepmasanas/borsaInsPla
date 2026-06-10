@@ -584,6 +584,37 @@ def estadisticas(request):
 # ==================== VISTES EMPRESA ====================
 
 @login_required
+def empresa_perfil(request):
+    """Perfil de l'empresa"""
+    if request.user.role != 'empresa':
+        messages.error(request, 'No tens permisos.')
+        return redirect('home')
+
+    try:
+        perfil = request.user.perfil_empresa
+    except PerfilEmpresa.DoesNotExist:
+        messages.error(request, '❌ El teu perfil d\'empresa no existeix.')
+        return redirect('home')
+
+    if request.method == 'POST':
+        perfil.nombre_empresa = request.POST.get('nombre_empresa', perfil.nombre_empresa).strip()
+        perfil.sector = request.POST.get('sector', '') or None
+        perfil.direccion = request.POST.get('direccion', '') or None
+        perfil.web = request.POST.get('web', '') or None
+        perfil.descripcion = request.POST.get('descripcion', '') or None
+
+        if 'logo' in request.FILES:
+            perfil.logo = request.FILES['logo']
+
+        perfil.save()
+        messages.success(request, 'Perfil actualitzat correctament.')
+        return redirect('empresa_perfil')
+
+    context = {'perfil': perfil}
+    return render(request, 'core/empresa/perfil.html', context)
+
+
+@login_required
 def empresa_ofertas(request):
     """Dashboard empresa - Llista d'ofertes propies"""
     if request.user.role != 'empresa':

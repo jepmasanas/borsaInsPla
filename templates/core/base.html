@@ -106,6 +106,9 @@
                             <a href="{% url 'empresa_ofertas' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
                                 📋 Les Meves Ofertes
                             </a>
+                            <a href="{% url 'empresa_perfil' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
+                                🏢 Perfil
+                            </a>
                         {% endif %}
 
                         <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors">
@@ -182,6 +185,9 @@
                     {% elif user.role == 'empresa' %}
                         <a href="{% url 'empresa_ofertas' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
                             📋 Les Meves Ofertes
+                        </a>
+                        <a href="{% url 'empresa_perfil' %}" class="block text-gray-700 hover:bg-gray-100 hover:text-blue-600 px-3 py-2.5 rounded-md text-base font-medium transition-colors">
+                            🏢 Perfil
                         </a>
                     {% endif %}
 

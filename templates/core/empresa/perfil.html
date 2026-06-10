@@ -1,0 +1,161 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Perfil de l'empresa{% endblock %}
+
+{% block content %}
+<div class="container mx-auto max-w-3xl">
+    <!-- Header -->
+    <div class="mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 flex items-center gap-2 sm:gap-3">
+            <span class="text-3xl sm:text-4xl">🏢</span>
+            <span>Perfil de l'empresa</span>
+        </h1>
+        <p class="text-sm sm:text-base text-gray-600 mt-2">
+            Completa la informació de la teva empresa perquè els alumnes la coneguin millor.
+        </p>
+    </div>
+
+    {% if not perfil.validado %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded">
+        <p class="font-bold text-sm sm:text-base">⚠️ Empresa pendent de validació</p>
+        <p class="text-xs sm:text-sm mt-1">El vostre perfil està pendent de validació per l'administració.</p>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+        <form method="post" enctype="multipart/form-data" class="p-6 sm:p-8 space-y-6">
+            {% csrf_token %}
+
+            <!-- Dades bàsiques -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Dades bàsiques</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="nombre_empresa" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Nom de l'empresa <span class="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="nombre_empresa"
+                            id="nombre_empresa"
+                            required
+                            value="{{ perfil.nombre_empresa }}"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="cif" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            CIF/NIF
+                        </label>
+                        <input
+                            type="text"
+                            id="cif"
+                            value="{{ perfil.cif }}"
+                            disabled
+                            class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                        >
+                        <p class="text-xs text-gray-400 mt-1">El CIF no es pot modificar. Contacta amb l'administrador si cal canviar-lo.</p>
+                    </div>
+
+                    <div>
+                        <label for="sector" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Sector
+                        </label>
+                        <input
+                            type="text"
+                            name="sector"
+                            id="sector"
+                            value="{{ perfil.sector|default:'' }}"
+                            placeholder="p.ex. Tecnologia, Salut, Educació..."
+                            class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="web" class="block text-sm font-medium text-gray-700 mb-1.5">
+                            Pàgina web
+                        </label>
+                        <input
+                            type="url"
+                            name="web"
+                            id="web"
+                            value="{{ perfil.web|default:'' }}"
+                            placeholder="https://www.empresa.cat"
+                            class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ubicació -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Ubicació</h2>
+                <div>
+                    <label for="direccion" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Adreça
+                    </label>
+                    <textarea
+                        name="direccion"
+                        id="direccion"
+                        rows="2"
+                        placeholder="Carrer, número, població..."
+                        class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none"
+                    >{{ perfil.direccion|default:'' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Descripció -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Descripció</h2>
+                <div>
+                    <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Descripció de l'empresa
+                    </label>
+                    <textarea
+                        name="descripcion"
+                        id="descripcion"
+                        rows="4"
+                        placeholder="Descriu l'activitat, els valors i l'equip de la teva empresa..."
+                        class="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+                    >{{ perfil.descripcion|default:'' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">Logo</h2>
+                {% if perfil.logo %}
+                <div class="mb-3 flex items-center gap-3">
+                    <img src="{{ perfil.logo.url }}" alt="Logo actual" class="h-16 w-16 object-contain rounded border border-gray-200">
+                    <span class="text-sm text-gray-600">Logo actual</span>
+                </div>
+                {% endif %}
+                <div>
+                    <label for="logo" class="block text-sm font-medium text-gray-700 mb-1.5">
+                        {% if perfil.logo %}Canviar logo{% else %}Pujar logo{% endif %}
+                    </label>
+                    <input
+                        type="file"
+                        name="logo"
+                        id="logo"
+                        accept=".jpg,.jpeg,.png"
+                        class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
+                    >
+                    <p class="text-xs text-gray-400 mt-1">Formats acceptats: JPG, PNG. Mida màxima recomanada: 500x500px.</p>
+                </div>
+            </div>
+
+            <!-- Botó guardar -->
+            <div class="flex justify-end pt-2">
+                <button
+                    type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition shadow-md hover:shadow-lg"
+                >
+                    Guardar canvis
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
