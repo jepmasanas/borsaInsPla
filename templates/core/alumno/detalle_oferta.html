@@ -58,14 +58,32 @@
 
             <!-- Información de la empresa -->
             <div class="mb-4 sm:mb-6">
-                <h2 class="text-base sm:text-lg lg:text-xl font-bold text-gray-800 mb-2 sm:mb-3">🏢 {% trans "Sobre l'empresa" %}</h2>
-                <p class="text-sm sm:text-base text-gray-700 font-medium break-words">{{ oferta.empresa.nombre_empresa }}</p>
-                {% if oferta.empresa.sector %}
-                <p class="text-xs sm:text-sm text-gray-600 mt-2"><strong>{% trans "Sector:" %}</strong> {{ oferta.empresa.sector }}</p>
-                {% endif %}
+                <h2 class="text-base sm:text-lg lg:text-xl font-bold text-gray-800 mb-3 sm:mb-4">🏢 {% trans "Sobre l'empresa" %}</h2>
+
+                <div class="flex items-center gap-4 mb-4">
+                    {% if oferta.empresa.logo %}
+                    <img src="{{ oferta.empresa.logo.url }}" alt="Logo {{ oferta.empresa.nombre_empresa }}" class="h-16 w-16 object-contain rounded border border-gray-200 flex-shrink-0">
+                    {% endif %}
+                    <div>
+                        <p class="text-sm sm:text-base text-gray-900 font-semibold break-words">{{ oferta.empresa.nombre_empresa }}</p>
+                        {% if oferta.empresa.sector %}
+                        <p class="text-xs sm:text-sm text-gray-500 mt-0.5">{{ oferta.empresa.sector }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
                 {% if oferta.empresa.descripcion %}
-                <p class="text-xs sm:text-sm lg:text-base text-gray-600 mt-3 leading-relaxed">{{ oferta.empresa.descripcion|truncatewords:50 }}</p>
+                <p class="text-xs sm:text-sm lg:text-base text-gray-700 leading-relaxed mb-3">{{ oferta.empresa.descripcion }}</p>
                 {% endif %}
+
+                <div class="space-y-1.5 text-xs sm:text-sm text-gray-600">
+                    {% if oferta.empresa.direccion %}
+                    <p>📍 {{ oferta.empresa.direccion }}</p>
+                    {% endif %}
+                    {% if oferta.empresa.web %}
+                    <p>🌐 <a href="{{ oferta.empresa.web }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">{{ oferta.empresa.web }}</a></p>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="border-b border-gray-200 my-4 sm:my-6"></div>
