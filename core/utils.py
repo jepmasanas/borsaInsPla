@@ -211,3 +211,75 @@ def send_welcome_email(user):
     except Exception as e:
         print(f"Error enviant email de benvinguda: {e}")
         return False
+
+
+def send_nueva_inscripcion_email(empresa_user, alumno_perfil, oferta):
+    """Envia email a l'empresa quan un alumne es inscriu a una oferta"""
+
+    subject = f'Nova inscripció a "{oferta.titulo}" - BorsaInsPla'
+
+    candidatos_url = f'/empresa/oferta/{oferta.pk}/candidatos/'
+
+    html_message = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+                       color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }}
+            .content {{ background: #f9fafb; padding: 30px; }}
+            .info-box {{ background: white; border-left: 4px solid #2563eb; padding: 16px 20px;
+                         border-radius: 0 8px 8px 0; margin: 20px 0; }}
+            .btn {{ display: inline-block; background: #2563eb; color: white; padding: 12px 28px;
+                    border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 16px; }}
+            .footer {{ background: #1f2937; color: #9ca3af; padding: 20px;
+                      text-align: center; border-radius: 0 0 10px 10px; font-size: 12px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎓 BorsaInsPla</h1>
+                <p>Borsa de Treball - Institut Pla de l'Estany</p>
+            </div>
+            <div class="content">
+                <h2>Nova inscripció rebuda!</h2>
+                <p>Hola, <strong>{empresa_user.username}</strong>!</p>
+                <p>Un nou candidat s'ha inscrit a una de les teves ofertes:</p>
+
+                <div class="info-box">
+                    <p><strong>Candidat:</strong> {alumno_perfil.nom_complet}</p>
+                    <p><strong>Oferta:</strong> {oferta.titulo}</p>
+                    <p><strong>Cicle:</strong> {alumno_perfil.cicle}</p>
+                    <p><strong>Any de graduació:</strong> {alumno_perfil.any_graduacio}</p>
+                </div>
+
+                <p>Accedeix a la plataforma per veure el perfil complet del candidat i gestionar la inscripció.</p>
+
+                <a href="https://borsainspla.com{candidatos_url}" class="btn">Veure candidats</a>
+            </div>
+            <div class="footer">
+                <p>© 2025 BorsaInsPla - Institut Pla de l'Estany</p>
+                <p>Aquest és un email automàtic, si us plau no responguis.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    try:
+        send_mail(
+            subject=subject,
+            message=f'Nova inscripció de {alumno_perfil.nom_complet} a "{oferta.titulo}".',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[empresa_user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        print(f"Email de nova inscripció enviat a {empresa_user.email}")
+        return True
+    except Exception as e:
+        print(f"Error enviant email de nova inscripció: {e}")
+        return False

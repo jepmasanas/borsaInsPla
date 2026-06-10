@@ -13,7 +13,7 @@ from .models import (
     User, PerfilEmpresa, PerfilAlumno, Oferta, Inscripcion,
     EmailVerification, PasswordRecovery, Notificacion
 )
-from .utils import send_verification_email, send_password_recovery_email, send_welcome_email
+from .utils import send_verification_email, send_password_recovery_email, send_welcome_email, send_nueva_inscripcion_email
 import json
 
 
@@ -948,6 +948,8 @@ def alumno_inscribirse(request, pk):
             inscripcion=inscripcion,
             oferta=oferta
         )
+
+        send_nueva_inscripcion_email(oferta.empresa.user, perfil, oferta)
 
         messages.success(request, 'Inscripció realitzada correctament!')
         return redirect('alumno_inscripciones')
