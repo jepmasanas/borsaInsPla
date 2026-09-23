@@ -1,3 +1,5 @@
+import re
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -1292,11 +1294,30 @@ def notificacion_eliminar(request, pk):
 
 # ==================== HELPER PARA CREAR NOTIFICACIONS ====================
 
+EMOJI_RE = re.compile(
+    "["
+    "\U0001F300-\U0001FAFF"
+    "\u2600-\u27BF"
+    "\uFE0F"
+    "\u200D"
+    "]",
+    flags=re.UNICODE,
+)
+
+
+def sanitize_notificacion_mensaje(mensaje):
+    """Remove emoji and other 4-byte UTF-8 characters that break MySQL utf8 tables."""
+    if mensaje is None:
+        return ''
+    texto = EMOJI_RE.sub('', mensaje)
+    return ' '.join(texto.split())
+
+
 def crear_notificacion(user, mensaje, tipo, url='', inscripcion=None, oferta=None):
     """Funció helper para crear notificacions"""
     Notificacion.objects.create(
         user=user,
-        mensaje=mensaje,
+        mensaje=sanitize_notificacion_mensaje(mensaje),
         tipo=tipo,
         url=url,
         inscripcion=inscripcion,
