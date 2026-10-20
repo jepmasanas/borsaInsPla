@@ -16,7 +16,9 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 NOTIFY_ADMIN_NEW_STUDENTS = os.getenv('NOTIFY_ADMIN_NEW_STUDENTS', 'True') == 'True'
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',') if h.strip()]
-#CSRF_TRUSTED_ORIGINS = ['http://borsainspla.raspberryip.com', 'https://borsainspla.raspberryip.com']
+#CSRF_TRUSTED_ORIGINS = ['http://borsainspla.', 'https://borsainspla.raspberryip.com']
+
+CSRF_TRUSTED_ORIGINS = ['https://borsa.elpla.org']
 
 # Application definition
 INSTALLED_APPS = [
@@ -63,12 +65,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        #'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'borsainspla_db'),
         'USER': os.getenv('DB_USER', 'borsainspla_user'),
         'PASSWORD': os.getenv('DB_PASSWORD', '1234'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        #'PORT': os.getenv('DB_PORT', '5432'),
+        'PORT': os.getenv('DB_PORT', '3306'),
     }
 }
 # ============================================
