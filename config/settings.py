@@ -63,18 +63,35 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.postgresql')
+
 DATABASES = {
     'default': {
+<<<<<<< HEAD
         #'ENGINE': 'django.db.backends.postgresql',
         'ENGINE': 'django.db.backends.mysql',
+=======
+        'ENGINE': DB_ENGINE,
+>>>>>>> 843ce1773a0b2c5ee40313613b9443d4395645f0
         'NAME': os.getenv('DB_NAME', 'borsainspla_db'),
         'USER': os.getenv('DB_USER', 'borsainspla_user'),
         'PASSWORD': os.getenv('DB_PASSWORD', '1234'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
+<<<<<<< HEAD
         #'PORT': os.getenv('DB_PORT', '5432'),
         'PORT': os.getenv('DB_PORT', '3306'),
+=======
+        'PORT': os.getenv('DB_PORT', '5432'),
+        'OPTIONS': {},
+>>>>>>> 843ce1773a0b2c5ee40313613b9443d4395645f0
     }
 }
+
+if DB_ENGINE == 'django.db.backends.mysql':
+    DATABASES['default']['OPTIONS'] = {
+        'charset': 'utf8mb4',
+        'use_unicode': True,
+    }
 # ============================================
 # VALIDADORES DE CONTRASEÑA SIMPLIFICADOS
 # ============================================
