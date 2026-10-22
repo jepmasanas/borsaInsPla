@@ -16,7 +16,11 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 NOTIFY_ADMIN_NEW_STUDENTS = os.getenv('NOTIFY_ADMIN_NEW_STUDENTS', 'True') == 'True'
 
 ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',') if h.strip()]
-#CSRF_TRUSTED_ORIGINS = ['http://borsainspla.raspberryip.com', 'https://borsainspla.raspberryip.com']
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', 'https://borsa.elpla.org').split(',') if o.strip()]
+
+# Necessari si un proxy invers (Nginx, Cloudflare...) acaba el HTTPS
+if os.getenv('USE_PROXY_SSL_HEADER', 'True') == 'True':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 INSTALLED_APPS = [
