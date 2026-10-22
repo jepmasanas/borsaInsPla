@@ -186,3 +186,6 @@ cython_debug/
 *.backup
 cert.pem
 key.pem
+
+.env
+*~
