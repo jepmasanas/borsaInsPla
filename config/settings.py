@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Carregar variables d'entorn ABANS de fer res més
+# Carregar variables d'entorn ABANS de fer res m??s
 load_dotenv(BASE_DIR / '.env')
 
 # Ara podem utilitzar os.getenv() per llegir les variables
-SECRET_KEY = os.getenv('SECRET_KEY', 'meter la contraseña en el env de ser posible')
+SECRET_KEY = os.getenv('SECRET_KEY', 'meter la contrase??a en el env de ser posible')
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
@@ -61,28 +61,37 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+DB_ENGINE = os.getenv('DB_ENGINE', 'django.db.backends.postgresql')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': DB_ENGINE,
         'NAME': os.getenv('DB_NAME', 'borsainspla_db'),
         'USER': os.getenv('DB_USER', 'borsainspla_user'),
-        'PASSWORD': os.getenv('DB_PASSWORD', '1234'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'D@m25s3rvidor'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': {},
     }
 }
+
+if DB_ENGINE == 'django.db.backends.mysql':
+    DATABASES['default']['OPTIONS'] = {
+        'charset': 'utf8mb4',
+        'use_unicode': True,
+    }
 # ============================================
-# VALIDADORES DE CONTRASEÑA SIMPLIFICADOS
+# VALIDADORES DE CONTRASE??A SIMPLIFICADOS
 # ============================================
 AUTH_PASSWORD_VALIDATORS = [
-    # Longitud mínima de 6 caracteres
+    # Longitud m??nima de 6 caracteres
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
         'OPTIONS': {
             'min_length': 6,
         }
     },
-    # Requiere mayúscula y símbolo
+    # Requiere may??scula y s??mbolo
     {
         'NAME': 'core.validators.ComplexityPasswordValidator',
     },
@@ -92,11 +101,11 @@ AUTH_PASSWORD_VALIDATORS = [
     # {
     #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     # },
-    # # Validador de contraseñas comunes de Django
+    # # Validador de contrase??as comunes de Django
     # {
     #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     # },
-    # # No permitir contraseñas completamente numèriques
+    # # No permitir contrase??as completamente num??riques
     # {
     #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     # },
@@ -106,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
     #         'max_sequence_length': 3,
     #     }
     # },
-    # # No permitir más de 2 caracteres repetidos (aaa, 111)
+    # # No permitir m??s de 2 caracteres repetidos (aaa, 111)
     # {
     #     'NAME': 'core.validators.RepeatedCharacterValidator',
     #     'OPTIONS': {
